@@ -18,6 +18,18 @@
       .replace(/"/g, "&quot;");
   }
 
+  // Los atributos HTML crudos en las notas (ej. <img src="...&amp;...">)
+  // vienen ya HTML-escapados. Hay que decodificarlos antes de reusar el
+  // valor como string plano (URL), o escapeHtml lo escapa doble.
+  function unescapeHtmlEntities(s) {
+    return (s || "")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'");
+  }
+
   /* --- Mini renderer Markdown -> HTML (sin dependencias externas) --- */
   function renderInline(text) {
     let t = escapeHtml(text);
@@ -112,7 +124,7 @@
         continue;
       }
       const img = line.match(/<img[^>]*\ssrc="([^"]+)"/i);
-      if (img && !portada) { portada = img[1]; continue; }
+      if (img && !portada) { portada = unescapeHtmlEntities(img[1]); continue; }
       const fu = line.match(/^\*\*Fuente:\*\*\s*(.*)$/);
       if (fu) { fuente = fu[1].trim(); continue; }
       const fe = line.match(/^\*\*Fecha archivado:\*\*\s*(.*)$/);
