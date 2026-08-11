@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ánfora</title>
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --card: #f9fafb;
+    --card-hover: #f3f4f6;
+    --accent: #2563eb;
+    --code-bg: #f3f4f6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0f1115;
+      --fg: #e5e7eb;
+      --muted: #9ca3af;
+      --border: #262a33;
+      --card: #171a21;
+      --card-hover: #1c202a;
+      --accent: #60a5fa;
+      --code-bg: #1c1f26;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 2.5rem 1.5rem 4rem;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.55;
+  }
+  main { max-width: 1180px; margin: 0 auto; }
+  h1 { font-size: 1.75rem; margin: 0 0 0.4rem; }
+  p.lead { color: var(--muted); margin: 0 0 1.75rem; max-width: 70ch; }
+
+  .search-bar { position: relative; margin-bottom: 1rem; }
+  .search-bar svg {
+    position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+    width: 18px; height: 18px; color: var(--muted); pointer-events: none;
+  }
+  .search-bar input {
+    width: 100%;
+    padding: 0.85rem 1rem 0.85rem 2.6rem;
+    font-size: 1rem;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--card);
+    color: var(--fg);
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  .search-bar input:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+  }
+  .toolbar-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6rem; margin-bottom: 0.5rem; }
+  .filters { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .filter-chip {
+    font-size: 0.82rem; font-weight: 600;
+    padding: 0.35rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+  .filter-chip:hover { background: var(--card-hover); }
+  .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .result-count { font-size: 0.85rem; color: var(--muted); margin: 0.25rem 0 1.5rem; }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
+
+  .note-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.1rem 1.2rem;
+    background: var(--card);
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .note-card:hover { background: var(--card-hover); border-color: var(--accent); }
+  .note-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .note-thumb {
+    width: 100%; aspect-ratio: 16 / 9; object-fit: cover;
+    border-radius: 8px; border: 1px solid var(--border);
+    background: var(--code-bg);
+  }
+  .note-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+  .note-title { font-size: 0.98rem; font-weight: 700; color: var(--fg); word-break: break-word; }
+  .note-domain { font-size: 0.78rem; color: var(--muted); display: block; margin-top: 0.1rem; }
+  .badge { font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0; background: var(--code-bg); color: var(--muted); }
+
+  .note-excerpt { margin: 0; font-size: 0.86rem; color: var(--fg); flex-grow: 1; min-height: 1.3em; }
+  .note-excerpt.empty { color: var(--muted); font-style: italic; }
+
+  .note-stats {
+    display: flex; align-items: center; gap: 0.9rem;
+    font-size: 0.76rem; color: var(--muted);
+    border-top: 1px solid var(--border);
+    padding-top: 0.55rem;
+  }
+
+  .empty-state { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 3rem 1rem; font-size: 0.95rem; }
+  .error-state { grid-column: 1 / -1; text-align: center; color: var(--muted); padding: 3rem 1rem; font-size: 0.9rem; }
+  footer { margin-top: 2.5rem; color: var(--muted); font-size: 0.85rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+  footer a { color: var(--accent); }
+
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0, 0, 0, 0.5); z-index: 100; padding: 4vh 1.5rem;
+  }
+  .modal-overlay.open { display: flex; align-items: center; justify-content: center; }
+  .modal-box {
+    max-width: 720px; width: 100%; max-height: 92vh; margin: 0 auto;
+    background: var(--bg); border: 1px solid var(--border); border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+  .modal-header {
+    display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem;
+    padding: 1.25rem 1.4rem; border-bottom: 1px solid var(--border); background: var(--bg); flex-shrink: 0;
+  }
+  .modal-title-group { display: flex; flex-direction: column; gap: 0.3rem; min-width: 0; }
+  .modal-title { font-size: 1.15rem; font-weight: 700; color: var(--fg); word-break: break-word; }
+  .modal-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem; font-size: 0.78rem; color: var(--muted); }
+  .modal-meta a { color: var(--accent); }
+  .modal-close {
+    flex-shrink: 0; width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+    background: var(--card); color: var(--fg); cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .modal-close:hover { background: var(--card-hover); }
+  .modal-body { padding: 1.4rem; font-size: 0.92rem; overflow-y: auto; flex: 1; min-height: 0; }
+
+  .note-body img { max-width: 100%; border-radius: 8px; margin: 0 0 1rem; display: block; }
+  .note-body h1, .note-body h2, .note-body h3, .note-body h4 { margin: 1.2rem 0 0.5rem; line-height: 1.3; font-size: 1rem; }
+  .note-body h1:first-child, .note-body h2:first-child, .note-body h3:first-child { margin-top: 0; }
+  .note-body p { margin: 0.6rem 0; }
+  .note-body ul, .note-body ol { margin: 0.6rem 0; padding-left: 1.4rem; }
+  .note-body li { margin: 0.2rem 0; }
+  .note-body a { color: var(--accent); }
+  .note-body code {
+    background: var(--code-bg); padding: 0.1rem 0.35rem; border-radius: 4px;
+    font-size: 0.85em; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  .note-body pre { background: var(--code-bg); padding: 0.9rem 1rem; border-radius: 8px; overflow-x: auto; margin: 0.7rem 0; }
+  .note-body pre code { background: none; padding: 0; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Ánfora</h1>
+  <p class="lead">Notas archivadas sobre IA y pensamiento sistémico. Esta página lee los archivos <code>.md</code> del repo en vivo — no hay contenido duplicado ni pre-generado.</p>
+
+  <div class="search-bar">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/></svg>
+    <input type="text" id="search-input" placeholder="Buscar notas por título, fuente o contenido…" autocomplete="off">
+  </div>
+  <div class="toolbar-row">
+    <div class="filters" id="filters">
+      <span class="filter-chip active" data-domain="all">Todas</span>
+    </div>
+  </div>
+  <p class="result-count" id="result-count"></p>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    <a href="https://github.com/luismulato/anfora" target="_blank" rel="noopener">Código fuente en GitHub</a>
+  </footer>
+</main>
+
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal-box" id="modal-box" role="dialog" aria-modal="true">
+    <div class="modal-header">
+      <div class="modal-title-group">
+        <span class="modal-title" id="modal-title"></span>
+        <div class="modal-meta" id="modal-meta"></div>
+      </div>
+      <button class="modal-close" id="modal-close" aria-label="Cerrar" title="Cerrar (Esc)">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
