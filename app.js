@@ -6,9 +6,15 @@
   const filtersEl = document.getElementById("filters");
   const resultCount = document.getElementById("result-count");
   const searchInput = document.getElementById("search-input");
+  const sortSelect = document.getElementById("sort-select");
+  const sortDirBtn = document.getElementById("sort-dir-btn");
+
+  const SORT_DEFAULT_DIR = { title: 1, date: -1, domain: 1, tipo: 1 };
 
   let notes = [];
   let activeDomain = "all";
+  let sortBy = "date";
+  let sortDir = SORT_DEFAULT_DIR[sortBy];
 
   function escapeHtml(s) {
     return (s || "")
@@ -45,18 +51,40 @@
     let html = "";
     let inCode = false;
     let listType = null;
+    let tableRows = null;
     const closeList = () => {
       if (listType) { html += `</${listType}>`; listType = null; }
+    };
+    const isTableRow = (l) => /^\s*\|.*\|\s*$/.test(l);
+    const isTableSep = (l) => /^\s*\|?(\s*:?-+:?\s*\|)+\s*:?-+:?\s*\|?\s*$/.test(l);
+    const parseTableRow = (l) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
+    const flushTable = () => {
+      if (!tableRows) return;
+      if (tableRows.length < 2 || !isTableSep(tableRows[1])) {
+        for (const l of tableRows) html += `<p>${renderInline(l.trim())}</p>`;
+        tableRows = null;
+        return;
+      }
+      const header = parseTableRow(tableRows[0]);
+      const bodyRows = tableRows.slice(2).map(parseTableRow);
+      html += "<table><thead><tr>" +
+        header.map((c) => `<th>${renderInline(c)}</th>`).join("") +
+        "</tr></thead><tbody>" +
+        bodyRows.map((r) => "<tr>" + r.map((c) => `<td>${renderInline(c)}</td>`).join("") + "</tr>").join("") +
+        "</tbody></table>";
+      tableRows = null;
     };
 
     for (const rawLine of lines) {
       const line = rawLine.replace(/\r$/, "");
 
       // Passthrough para la imagen de portada (<img ...>), la única
-      // etiqueta HTML cruda que usan las notas de Ánfora.
+      // etiqueta HTML cruda que usan las notas de Ánfora. Se fuerza
+      // referrerpolicy="no-referrer" porque algunas fuentes bloquean
+      // la carga si detectan un Referer de otro dominio (hotlinking).
       if (/^\s*<img\s/i.test(line)) {
         closeList();
-        html += line.trim();
+        html += line.trim().replace(/^<img /i, '<img referrerpolicy="no-referrer" ');
         continue;
       }
 
@@ -75,6 +103,12 @@
         html += escapeHtml(line) + "\n";
         continue;
       }
+
+      if (isTableRow(line)) {
+        tableRows = tableRows ? [...tableRows, line] : [line];
+        continue;
+      }
+      if (tableRows) flushTable();
 
       const heading = line.match(/^(#{1,4})\s+(.*)$/);
       if (heading) {
@@ -102,6 +136,7 @@
       html += `<p>${renderInline(line)}</p>`;
     }
     closeList();
+    flushTable();
     if (inCode) html += "</code></pre>";
     return html;
   }
@@ -186,6 +221,29 @@
     });
   }
 
+  function sortKey(n) {
+    switch (sortBy) {
+      case "date": return n.fechaArchivado || "";
+      case "domain": return n.domain || "";
+      case "tipo": return n.tipo || "";
+      case "title":
+      default: return n.title || "";
+    }
+  }
+
+  function sortNotes(list) {
+    return [...list].sort((a, b) => {
+      const ka = sortKey(a).toLowerCase();
+      const kb = sortKey(b).toLowerCase();
+      if (ka === kb) return a.title.localeCompare(b.title);
+      return ka.localeCompare(kb) * sortDir;
+    });
+  }
+
+  function updateSortDirBtn() {
+    sortDirBtn.classList.toggle("desc", sortDir === -1);
+  }
+
   function matchesSearch(note, q) {
     if (!q) return true;
     const hay = `${note.title} ${note.fuente || ""} ${note.tipo || ""} ${note.excerpt} ${note.bodyMd}`.toLowerCase();
@@ -194,16 +252,14 @@
 
   function noteCard(note) {
     const thumb = note.portada
-      ? `<img class="note-thumb" src="${escapeHtml(note.portada)}" alt="" loading="lazy">`
+      ? `<img class="note-thumb" src="${escapeHtml(note.portada)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
       : "";
     return `
       <div class="note-card" tabindex="0" data-path="${escapeHtml(note.path)}">
         ${thumb}
         <div class="note-head">
-          <div>
-            <span class="note-title">${escapeHtml(note.title)}</span>
-            <span class="note-domain">${escapeHtml(note.domain)}</span>
-          </div>
+          <span class="note-title">${escapeHtml(note.title)}</span>
+          <span class="note-domain">${escapeHtml(note.domain)}</span>
           ${note.tipo ? `<span class="badge">${escapeHtml(note.tipo)}</span>` : ""}
         </div>
         <p class="note-excerpt ${note.excerpt ? "" : "empty"}">${escapeHtml(note.excerpt || "Sin resumen")}</p>
@@ -214,10 +270,11 @@
   function render() {
     const q = searchInput.value.trim();
     const filtered = notes.filter((n) => (activeDomain === "all" || n.domain === activeDomain) && matchesSearch(n, q));
+    const sorted = sortNotes(filtered);
 
-    resultCount.textContent = `${filtered.length} de ${notes.length} notas`;
-    grid.innerHTML = filtered.length
-      ? filtered.map(noteCard).join("")
+    resultCount.textContent = `${sorted.length} de ${notes.length} notas`;
+    grid.innerHTML = sorted.length
+      ? sorted.map(noteCard).join("")
       : `<div class="empty-state">No hay notas que coincidan.</div>`;
 
     grid.querySelectorAll(".note-card").forEach((card) => {
@@ -256,9 +313,22 @@
 
   searchInput.addEventListener("input", render);
 
+  sortSelect.addEventListener("change", () => {
+    sortBy = sortSelect.value;
+    sortDir = SORT_DEFAULT_DIR[sortBy];
+    updateSortDirBtn();
+    render();
+  });
+
+  sortDirBtn.addEventListener("click", () => {
+    sortDir *= -1;
+    updateSortDirBtn();
+    render();
+  });
+
   try {
     notes = await loadNotes();
-    notes.sort((a, b) => (b.fechaArchivado || "").localeCompare(a.fechaArchivado || ""));
+    updateSortDirBtn();
     buildFilters();
     render();
   } catch (err) {

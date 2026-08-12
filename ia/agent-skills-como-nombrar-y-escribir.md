@@ -1,10 +1,8 @@
 # Agent Skills (Claude Code) — cómo nombrar y escribir una skill
 
-**Fecha:** 2026-08-11
-**Fuente:** síntesis propia a partir de la guía oficial de Anthropic para
-Agent Skills + convenciones generales de naming de CLI/software (no es
-copia textual del doc oficial — para el original, ver la documentación
-de Claude Code / Agent Skills de Anthropic).
+**Fuente:** síntesis propia a partir de la guía oficial de Anthropic para Agent Skills + convenciones generales de naming de CLI/software (no es copia textual del doc oficial — para el original, ver la documentación de Claude Code / Agent Skills de Anthropic).
+**Fecha archivado:** 2026-08-11
+**Tipo:** Guía
 
 ## Qué es
 

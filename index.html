@@ -78,6 +78,37 @@
   .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .result-count { font-size: 0.85rem; color: var(--muted); margin: 0.25rem 0 1.5rem; }
 
+  .sort-bar { display: flex; align-items: center; gap: 0.4rem; }
+  .sort-bar label { font-size: 0.82rem; color: var(--muted); }
+  .sort-select {
+    font-size: 0.82rem; font-weight: 600;
+    padding: 0.35rem 1.8rem 0.35rem 0.8rem;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--fg);
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.6rem center;
+    background-size: 14px;
+  }
+  .sort-select:hover { background-color: var(--card-hover); }
+  .sort-dir-btn {
+    width: 30px; height: 30px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--fg);
+    cursor: pointer;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+  .sort-dir-btn:hover { background: var(--card-hover); border-color: var(--accent); }
+  .sort-dir-btn svg { width: 15px; height: 15px; transition: transform 0.15s ease; }
+  .sort-dir-btn.desc svg { transform: rotate(180deg); }
+
   .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
   @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
   @media (max-width: 620px) { .grid { grid-template-columns: 1fr; } }
@@ -101,10 +132,10 @@
     border-radius: 8px; border: 1px solid var(--border);
     background: var(--code-bg);
   }
-  .note-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 0.5rem; }
+  .note-head { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
   .note-title { font-size: 0.98rem; font-weight: 700; color: var(--fg); word-break: break-word; }
   .note-domain { font-size: 0.78rem; color: var(--muted); display: block; margin-top: 0.1rem; }
-  .badge { font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 999px; white-space: nowrap; flex-shrink: 0; background: var(--code-bg); color: var(--muted); }
+  .badge { font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 999px; max-width: 100%; background: var(--code-bg); color: var(--muted); }
 
   .note-excerpt { margin: 0; font-size: 0.86rem; color: var(--fg); flex-grow: 1; min-height: 1.3em; }
   .note-excerpt.empty { color: var(--muted); font-style: italic; }
@@ -161,6 +192,9 @@
   }
   .note-body pre { background: var(--code-bg); padding: 0.9rem 1rem; border-radius: 8px; overflow-x: auto; margin: 0.7rem 0; }
   .note-body pre code { background: none; padding: 0; }
+  .note-body table { width: 100%; border-collapse: collapse; margin: 0.7rem 0; font-size: 0.86rem; }
+  .note-body th, .note-body td { border: 1px solid var(--border); padding: 0.4rem 0.6rem; text-align: left; vertical-align: top; }
+  .note-body th { background: var(--card); font-weight: 600; }
 </style>
 </head>
 <body>
@@ -175,6 +209,18 @@
   <div class="toolbar-row">
     <div class="filters" id="filters">
       <span class="filter-chip active" data-domain="all">Todas</span>
+    </div>
+    <div class="sort-bar">
+      <label for="sort-select">Ordenar por</label>
+      <select class="sort-select" id="sort-select">
+        <option value="date">Más reciente</option>
+        <option value="title">Alfabético</option>
+        <option value="domain">Dominio</option>
+        <option value="tipo">Tipo</option>
+      </select>
+      <button type="button" class="sort-dir-btn" id="sort-dir-btn" title="Cambiar dirección">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="6 14 12 20 18 14"/></svg>
+      </button>
     </div>
   </div>
   <p class="result-count" id="result-count"></p>

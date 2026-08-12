@@ -4,7 +4,7 @@
 
 **Fuente:** https://youtube.com/shorts/Hh9KqdZkNe8?si=yzeaoDkOTm7OavkR
 **Fecha archivado:** 2026-08-11
-**Tipo:** Video de YouTube
+**Tipo:** Video
 
 ## Resumen
 
