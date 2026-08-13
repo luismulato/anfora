@@ -1,13 +1,17 @@
 [
   "ia/agent-skills-como-nombrar-y-escribir.md",
+  "ia/claude-capcut-automatizar-edicion.md",
   "ia/claude-code-modos-de-permisos.md",
   "ia/claude-design-animaciones-3d.md",
   "ia/claude-md-guia-para-llenarlo.md",
+  "ia/continue-dev-extension-vscode.md",
   "ia/empatia-artificial-antropomorfismo.md",
+  "ia/gsap-scrolltrigger-animaciones-3d.md",
   "ia/ia-en-navegador-sin-backend.md",
   "ia/meta-muse-code-agente-terminal.md",
   "ia/openrouter-primera-llamada-api.md",
   "ia/repositorio-secreto-apis-ia.md",
   "ia/shortcuts-vscode-claude-code.md",
+  "ia/skills-sh-vercel-claude-code.md",
   "systems-thinking/state-of-organizations-2026.md"
 ]
