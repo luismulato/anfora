@@ -216,7 +216,7 @@
   function buildFilters() {
     const domains = [...new Set(notes.map((n) => n.domain))].sort();
     filtersEl.innerHTML = `<span class="filter-chip active" data-domain="all">Todas</span>` +
-      domains.map((d) => `<span class="filter-chip" data-domain="${escapeHtml(d)}">${escapeHtml(d)}</span>`).join("");
+      domains.map((d) => `<span class="filter-chip domain-chip" data-domain="${escapeHtml(d)}" style="--hue: ${domainHue(d)}">${escapeHtml(d)}</span>`).join("");
 
     filtersEl.querySelectorAll(".filter-chip").forEach((chip) => {
       chip.addEventListener("click", () => {
