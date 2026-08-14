@@ -18,6 +18,46 @@
   let sortBy = "date";
   let sortDir = SORT_DEFAULT_DIR[sortBy];
 
+  /* --- Paleta de colores por dominio: persistida, sin recargar --- */
+  const palettePicker = document.getElementById("palette-picker");
+  const paletteTrigger = document.getElementById("palette-trigger");
+  const paletteMenu = document.getElementById("palette-menu");
+  let palette = localStorage.getItem("anfora-palette") || "sutil";
+  document.documentElement.setAttribute("data-palette", palette);
+
+  function updatePaletteMenuUI() {
+    paletteMenu.querySelectorAll(".palette-swatch").forEach((sw) => {
+      sw.classList.toggle("active", sw.dataset.palette === palette);
+    });
+  }
+
+  function setPalette(p) {
+    palette = p;
+    document.documentElement.setAttribute("data-palette", p);
+    localStorage.setItem("anfora-palette", p);
+    updatePaletteMenuUI();
+  }
+
+  paletteTrigger.addEventListener("click", () => {
+    const willOpen = paletteMenu.hasAttribute("hidden");
+    if (willOpen) { paletteMenu.removeAttribute("hidden"); palettePicker.classList.add("open"); }
+    else { paletteMenu.setAttribute("hidden", ""); palettePicker.classList.remove("open"); }
+  });
+  paletteMenu.querySelectorAll(".palette-swatch").forEach((sw) => {
+    sw.addEventListener("click", () => {
+      setPalette(sw.dataset.palette);
+      paletteMenu.setAttribute("hidden", "");
+      palettePicker.classList.remove("open");
+    });
+  });
+  document.addEventListener("click", (e) => {
+    if (!palettePicker.contains(e.target)) {
+      paletteMenu.setAttribute("hidden", "");
+      palettePicker.classList.remove("open");
+    }
+  });
+  updatePaletteMenuUI();
+
   function escapeHtml(s) {
     return (s || "")
       .replace(/&/g, "&amp;")

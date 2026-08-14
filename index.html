@@ -28,6 +28,35 @@
       --code-bg: #1c1f26;
     }
   }
+
+  /* Paletas para los colores por dominio (badges, chips). El --hue de
+     cada dominio no cambia entre paletas — lo que cambia es cómo se
+     traduce a saturación/luz/efecto, así el mapeo dominio->color se
+     mantiene reconocible pase lo que pase. */
+  :root, :root[data-palette="sutil"] {
+    --pal-sat: 30%;
+    --pal-light: 46%;
+    --pal-tint: 12%;
+    --pal-tipo-text: 75%;
+    --pal-border: 35%;
+    --pal-glow: none;
+  }
+  :root[data-palette="cyberpunk"] {
+    --pal-sat: 100%;
+    --pal-light: 52%;
+    --pal-tint: 24%;
+    --pal-tipo-text: 95%;
+    --pal-border: 70%;
+    --pal-glow: 0 0 8px hsl(var(--hue) 100% 55% / 0.65);
+  }
+  :root[data-palette="solarpunk"] {
+    --pal-sat: 55%;
+    --pal-light: 42%;
+    --pal-tint: 16%;
+    --pal-tipo-text: 80%;
+    --pal-border: 45%;
+    --pal-glow: none;
+  }
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -77,14 +106,15 @@
   .filter-chip:hover { background: var(--card-hover); }
   .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .filter-chip.domain-chip {
-    color: hsl(var(--hue) 60% 40%);
-    border-color: color-mix(in srgb, hsl(var(--hue) 60% 40%) 45%, var(--border) 55%);
+    color: hsl(var(--hue) var(--pal-sat) var(--pal-light));
+    border-color: color-mix(in srgb, hsl(var(--hue) var(--pal-sat) var(--pal-light)) var(--pal-border), var(--border));
   }
-  .filter-chip.domain-chip:hover { background: color-mix(in srgb, hsl(var(--hue) 60% 40%) 14%, var(--card) 86%); }
+  .filter-chip.domain-chip:hover { background: color-mix(in srgb, hsl(var(--hue) var(--pal-sat) var(--pal-light)) var(--pal-tint), var(--card)); }
   .filter-chip.domain-chip.active {
-    background: hsl(var(--hue) 60% 40%);
-    border-color: hsl(var(--hue) 60% 40%);
+    background: hsl(var(--hue) var(--pal-sat) var(--pal-light));
+    border-color: hsl(var(--hue) var(--pal-sat) var(--pal-light));
     color: #fff;
+    box-shadow: var(--pal-glow);
   }
   .result-count { font-size: 0.85rem; color: var(--muted); margin: 0.25rem 0 1.5rem; }
 
@@ -178,12 +208,13 @@
   .badge-domain {
     margin-left: auto;
     color: #fff;
-    background: hsl(var(--hue) 60% 40%);
+    background: hsl(var(--hue) var(--pal-sat) var(--pal-light));
+    box-shadow: var(--pal-glow);
   }
   .badge-tipo {
-    color: color-mix(in srgb, hsl(var(--hue) 75% 50%) 80%, var(--fg) 20%);
-    background: color-mix(in srgb, hsl(var(--hue) 75% 50%) 16%, var(--card) 84%);
-    border: 1px solid color-mix(in srgb, hsl(var(--hue) 75% 50%) 45%, var(--border) 55%);
+    color: color-mix(in srgb, hsl(var(--hue) var(--pal-sat) var(--pal-light)) var(--pal-tipo-text), var(--fg));
+    background: color-mix(in srgb, hsl(var(--hue) var(--pal-sat) var(--pal-light)) var(--pal-tint), var(--card));
+    border: 1px solid color-mix(in srgb, hsl(var(--hue) var(--pal-sat) var(--pal-light)) var(--pal-border), var(--border));
   }
 
   .note-excerpt { margin: 0; font-size: 0.86rem; color: var(--fg); flex-grow: 1; min-height: 1.3em; }
@@ -257,9 +288,50 @@
   .note-embed { position: relative; width: 100%; aspect-ratio: 16 / 9; margin-top: 1.3rem; border-radius: 10px; overflow: hidden; background: var(--code-bg); }
   .note-embed.portrait { max-width: 320px; aspect-ratio: 9 / 16; margin-left: auto; margin-right: auto; }
   .note-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
+  .palette-picker { position: fixed; top: 1rem; right: 1rem; z-index: 200; }
+  .palette-trigger {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--card);
+    color: var(--muted); opacity: 0.45; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: opacity 0.15s ease, background 0.15s ease;
+  }
+  .palette-trigger svg { width: 14px; height: 14px; }
+  .palette-trigger:hover, .palette-picker.open .palette-trigger { opacity: 1; background: var(--card-hover); }
+  .palette-menu {
+    position: absolute; top: calc(100% + 0.5rem); right: 0;
+    display: flex; gap: 0.45rem;
+    background: var(--card); border: 1px solid var(--border); border-radius: 999px;
+    padding: 0.45rem; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+  .palette-menu[hidden] { display: none; }
+  .palette-swatch {
+    width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border);
+    cursor: pointer; padding: 0;
+  }
+  .palette-swatch[data-palette="sutil"] { background: hsl(212 28% 46%); }
+  .palette-swatch[data-palette="cyberpunk"] { background: hsl(300 100% 55%); box-shadow: 0 0 6px hsl(300 100% 55% / 0.7); }
+  .palette-swatch[data-palette="solarpunk"] { background: hsl(95 55% 40%); }
+  .palette-swatch.active { outline: 2px solid var(--fg); outline-offset: 2px; }
 </style>
 </head>
 <body>
+<div class="palette-picker" id="palette-picker">
+  <button type="button" class="palette-trigger" id="palette-trigger" aria-label="Elegir paleta de colores" title="Paleta de colores">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2a10 10 0 1 0 6.5 17.5c.7-.6.3-1.7-.6-1.7h-1.4a2.5 2.5 0 0 1-1.8-4.3c.5-.5.7-1.2.5-1.9A2.5 2.5 0 0 1 17.6 8H19a1 1 0 0 0 .9-1.5A10 10 0 0 0 12 2z"/>
+      <circle cx="7.5" cy="10.5" r="1.2" fill="currentColor" stroke="none"/>
+      <circle cx="9.5" cy="15.5" r="1.2" fill="currentColor" stroke="none"/>
+      <circle cx="14" cy="6.5" r="1.2" fill="currentColor" stroke="none"/>
+    </svg>
+  </button>
+  <div class="palette-menu" id="palette-menu" hidden>
+    <button type="button" class="palette-swatch" data-palette="sutil" title="Sutil"></button>
+    <button type="button" class="palette-swatch" data-palette="cyberpunk" title="Cyberpunk"></button>
+    <button type="button" class="palette-swatch" data-palette="solarpunk" title="Solarpunk"></button>
+  </div>
+</div>
 <main>
   <h1>Ánfora</h1>
   <p class="lead">Notas archivadas sobre IA y pensamiento sistémico. Esta página lee los archivos <code>.md</code> del repo en vivo — no hay contenido duplicado ni pre-generado.</p>
