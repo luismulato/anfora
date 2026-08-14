@@ -58,6 +58,29 @@
   });
   updatePaletteMenuUI();
 
+  /* --- Tema claro/oscuro: override explícito sobre prefers-color-scheme --- */
+  const themeToggle = document.getElementById("theme-toggle");
+  let theme = localStorage.getItem("anfora-theme"); // "light" | "dark" | null (sigue al sistema)
+
+  function applyTheme() {
+    if (theme) document.documentElement.setAttribute("data-theme", theme);
+    else document.documentElement.removeAttribute("data-theme");
+    themeToggle.querySelectorAll(".theme-btn").forEach((b) => {
+      b.classList.toggle("active", b.dataset.theme === theme);
+    });
+  }
+
+  themeToggle.querySelectorAll(".theme-btn").forEach((b) => {
+    b.addEventListener("click", () => {
+      // Click de nuevo sobre el activo = volver a seguir el sistema.
+      theme = theme === b.dataset.theme ? null : b.dataset.theme;
+      if (theme) localStorage.setItem("anfora-theme", theme);
+      else localStorage.removeItem("anfora-theme");
+      applyTheme();
+    });
+  });
+  applyTheme();
+
   function escapeHtml(s) {
     return (s || "")
       .replace(/&/g, "&amp;")
