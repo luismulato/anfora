@@ -22,12 +22,12 @@
   const palettePicker = document.getElementById("palette-picker");
   const paletteTrigger = document.getElementById("palette-trigger");
   const paletteMenu = document.getElementById("palette-menu");
-  let palette = localStorage.getItem("anfora-palette") || "sutil";
+  let palette = localStorage.getItem("anfora-palette") || "estandar";
   document.documentElement.setAttribute("data-palette", palette);
 
   function updatePaletteMenuUI() {
-    paletteMenu.querySelectorAll(".palette-swatch").forEach((sw) => {
-      sw.classList.toggle("active", sw.dataset.palette === palette);
+    paletteMenu.querySelectorAll(".palette-option").forEach((opt) => {
+      opt.classList.toggle("active", opt.dataset.palette === palette);
     });
   }
 
@@ -43,9 +43,9 @@
     if (willOpen) { paletteMenu.removeAttribute("hidden"); palettePicker.classList.add("open"); }
     else { paletteMenu.setAttribute("hidden", ""); palettePicker.classList.remove("open"); }
   });
-  paletteMenu.querySelectorAll(".palette-swatch").forEach((sw) => {
-    sw.addEventListener("click", () => {
-      setPalette(sw.dataset.palette);
+  paletteMenu.querySelectorAll(".palette-option").forEach((opt) => {
+    opt.addEventListener("click", () => {
+      setPalette(opt.dataset.palette);
       paletteMenu.setAttribute("hidden", "");
       palettePicker.classList.remove("open");
     });
@@ -256,7 +256,7 @@
   function buildFilters() {
     const domains = [...new Set(notes.map((n) => n.domain))].sort();
     filtersEl.innerHTML = `<span class="filter-chip active" data-domain="all">Todas</span>` +
-      domains.map((d) => `<span class="filter-chip domain-chip" data-domain="${escapeHtml(d)}" style="--hue: ${domainHue(d)}">${escapeHtml(d)}</span>`).join("");
+      domains.map((d) => `<span class="filter-chip domain-chip accent-${domainAccentIndex(d)}" data-domain="${escapeHtml(d)}">${escapeHtml(d)}</span>`).join("");
 
     filtersEl.querySelectorAll(".filter-chip").forEach((chip) => {
       chip.addEventListener("click", () => {
@@ -322,29 +322,30 @@
     return hay.includes(q.toLowerCase());
   }
 
-  // Hash determinístico string -> hue (0-359), para que cada dominio
-  // tenga siempre el mismo color sin tener que mantener un mapa a mano.
-  function domainHue(domain) {
+  // Hash determinístico string -> índice 0-2, para elegir siempre el
+  // mismo acento (de los 3 que define la paleta activa) por dominio,
+  // sin mantener un mapa a mano.
+  function domainAccentIndex(domain) {
     let hash = 0;
     for (let i = 0; i < domain.length; i++) {
       hash = (hash * 31 + domain.charCodeAt(i)) >>> 0;
     }
-    return hash % 360;
+    return hash % 3;
   }
 
   function noteCard(note) {
     const thumb = note.portada
       ? `<img class="note-thumb" src="${escapeHtml(note.portada)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
       : "";
-    const hue = domainHue(note.domain);
+    const accentClass = `accent-${domainAccentIndex(note.domain)}`;
     return `
       <div class="note-card" tabindex="0" data-path="${escapeHtml(note.path)}">
         ${thumb}
         <div class="note-head">
           <span class="note-title">${escapeHtml(note.title)}</span>
           <div class="badge-row">
-            ${note.tipo ? `<span class="badge-tipo" style="--hue: ${hue}">${escapeHtml(note.tipo)}</span>` : ""}
-            <span class="badge-domain" style="--hue: ${hue}">${escapeHtml(note.domain)}</span>
+            ${note.tipo ? `<span class="badge-tipo ${accentClass}">${escapeHtml(note.tipo)}</span>` : ""}
+            <span class="badge-domain ${accentClass}">${escapeHtml(note.domain)}</span>
           </div>
         </div>
         <p class="note-excerpt ${note.excerpt ? "" : "empty"}">${escapeHtml(note.excerpt || "Sin resumen")}</p>

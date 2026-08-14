@@ -5,58 +5,106 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ánfora</title>
 <style>
-  :root {
+  /* Tres sistemas de color completos (no variantes de tono de uno
+     solo) — cada uno con su propio claro/oscuro. "Estándar" es el
+     default. El --pal-accent-N (3 acentos por sistema) es lo que usan
+     los badges/chips de dominio — cada dominio elige uno por hash,
+     no por hue continuo, así los colores quedan siempre dentro de la
+     combinación curada de esa paleta. */
+  :root, :root[data-palette="estandar"] {
     color-scheme: light dark;
-    --bg: #ffffff;
-    --fg: #1a1a1a;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --card: #f9fafb;
-    --card-hover: #f3f4f6;
-    --accent: #2563eb;
-    --code-bg: #f3f4f6;
-  }
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --bg: #0f1115;
-      --fg: #e5e7eb;
-      --muted: #9ca3af;
-      --border: #262a33;
-      --card: #171a21;
-      --card-hover: #1c202a;
-      --accent: #60a5fa;
-      --code-bg: #1c1f26;
-    }
-  }
-
-  /* Paletas para los colores por dominio (badges, chips). El --hue de
-     cada dominio no cambia entre paletas — lo que cambia es cómo se
-     traduce a saturación/luz/efecto, así el mapeo dominio->color se
-     mantiene reconocible pase lo que pase. */
-  :root, :root[data-palette="sutil"] {
-    --pal-sat: 30%;
-    --pal-light: 46%;
-    --pal-tint: 12%;
-    --pal-tipo-text: 75%;
-    --pal-border: 35%;
+    --bg: #FFFFFF;
+    --fg: #1A1A1A;
+    --muted: #6C757D;
+    --border: #E5E5EA;
+    --card: #F8F9FA;
+    --card-hover: #EAEAEA;
+    --accent: #007AFF;
+    --code-bg: #F2F2F7;
+    --pal-accent-0: #007AFF;
+    --pal-accent-1: #5856D6;
+    --pal-accent-2: #FF9500;
     --pal-glow: none;
   }
   :root[data-palette="cyberpunk"] {
-    --pal-sat: 100%;
-    --pal-light: 52%;
-    --pal-tint: 24%;
-    --pal-tipo-text: 95%;
-    --pal-border: 70%;
-    --pal-glow: 0 0 8px hsl(var(--hue) 100% 55% / 0.65);
-  }
-  :root[data-palette="solarpunk"] {
-    --pal-sat: 55%;
-    --pal-light: 42%;
-    --pal-tint: 16%;
-    --pal-tipo-text: 80%;
-    --pal-border: 45%;
+    color-scheme: light dark;
+    --bg: #F4F4F9;
+    --fg: #0B0B0E;
+    --muted: #5C5C7A;
+    --border: #C3C3D8;
+    --card: #E4E4ED;
+    --card-hover: #DCDCE7;
+    --accent: #00B3CC;
+    --code-bg: #EDEDF5;
+    --pal-accent-0: #00B3CC;
+    --pal-accent-1: #E6005C;
+    --pal-accent-2: #6600CC;
     --pal-glow: none;
   }
+  :root[data-palette="solarpunk"] {
+    color-scheme: light dark;
+    --bg: #FBF9F6;
+    --fg: #2D3A34;
+    --muted: #7A8A82;
+    --border: #DDD4C4;
+    --card: #F0ECE3;
+    --card-hover: #EBE5D8;
+    --accent: #2A7B50;
+    --code-bg: #F7F3EB;
+    --pal-accent-0: #2A7B50;
+    --pal-accent-1: #D97736;
+    --pal-accent-2: #8C4314;
+    --pal-glow: none;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root, :root[data-palette="estandar"] {
+      --bg: #000000;
+      --fg: #FFFFFF;
+      --muted: #9EA3AE;
+      --border: #1C1C1E;
+      --card: #121214;
+      --card-hover: #2C2C2E;
+      --accent: #2F80ED;
+      --code-bg: #161618;
+      --pal-accent-0: #2F80ED;
+      --pal-accent-1: #9B51E0;
+      --pal-accent-2: #F2994A;
+    }
+    :root[data-palette="cyberpunk"] {
+      --bg: #000000;
+      --fg: #F4F4F9;
+      --muted: #636380;
+      --border: #2E2E42;
+      --card: #0A0A0F;
+      --card-hover: #1A1A2B;
+      --accent: #00FFFF;
+      --code-bg: #0F0F17;
+      --pal-accent-0: #00FFFF;
+      --pal-accent-1: #FF0066;
+      --pal-accent-2: #7F00FF;
+      --pal-glow: 0 0 8px color-mix(in srgb, var(--ac, var(--accent)) 70%, transparent);
+    }
+    :root[data-palette="solarpunk"] {
+      --bg: #000000;
+      --fg: #ECF3F0;
+      --muted: #5E7368;
+      --border: #26362E;
+      --card: #0F1411;
+      --card-hover: #1E2B24;
+      --accent: #2BE67F;
+      --code-bg: #161F1A;
+      --pal-accent-0: #2BE67F;
+      --pal-accent-1: #E6732B;
+      --pal-accent-2: #4A90E2;
+    }
+  }
+
+  /* Cada nota/chip elige uno de los 3 acentos de la paleta activa por
+     hash de su dominio (accent-0/1/2), nunca un hue calculado. */
+  .accent-0 { --ac: var(--pal-accent-0); }
+  .accent-1 { --ac: var(--pal-accent-1); }
+  .accent-2 { --ac: var(--pal-accent-2); }
+
   * { box-sizing: border-box; }
   body {
     margin: 0;
@@ -106,13 +154,13 @@
   .filter-chip:hover { background: var(--card-hover); }
   .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .filter-chip.domain-chip {
-    color: hsl(var(--hue) var(--pal-sat) var(--pal-light));
-    border-color: color-mix(in srgb, hsl(var(--hue) var(--pal-sat) var(--pal-light)) var(--pal-border), var(--border));
+    color: var(--ac);
+    border-color: color-mix(in srgb, var(--ac) 45%, var(--border));
   }
-  .filter-chip.domain-chip:hover { background: color-mix(in srgb, hsl(var(--hue) var(--pal-sat) var(--pal-light)) var(--pal-tint), var(--card)); }
+  .filter-chip.domain-chip:hover { background: color-mix(in srgb, var(--ac) 14%, var(--card)); }
   .filter-chip.domain-chip.active {
-    background: hsl(var(--hue) var(--pal-sat) var(--pal-light));
-    border-color: hsl(var(--hue) var(--pal-sat) var(--pal-light));
+    background: var(--ac);
+    border-color: var(--ac);
     color: #fff;
     box-shadow: var(--pal-glow);
   }
@@ -198,8 +246,9 @@
   .badge { font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 999px; max-width: 100%; background: var(--code-bg); color: var(--muted); }
 
   /* Fila tipo (izq., tinte/borde) + dominio (der., relleno sólido) —
-     mismo --hue por nota, así queda claro que están relacionados pero
-     el relleno marca cuál es "categoría" (dominio) y cuál "tipo". */
+     mismo --ac (accent-0/1/2 según la paleta) por nota, así queda
+     claro que están relacionados pero el relleno marca cuál es
+     "categoría" (dominio) y cuál "tipo". */
   .badge-row { display: flex; align-items: center; width: 100%; gap: 0.5rem; }
   .badge-tipo, .badge-domain {
     font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.55rem;
@@ -208,13 +257,13 @@
   .badge-domain {
     margin-left: auto;
     color: #fff;
-    background: hsl(var(--hue) var(--pal-sat) var(--pal-light));
+    background: var(--ac);
     box-shadow: var(--pal-glow);
   }
   .badge-tipo {
-    color: color-mix(in srgb, hsl(var(--hue) var(--pal-sat) var(--pal-light)) var(--pal-tipo-text), var(--fg));
-    background: color-mix(in srgb, hsl(var(--hue) var(--pal-sat) var(--pal-light)) var(--pal-tint), var(--card));
-    border: 1px solid color-mix(in srgb, hsl(var(--hue) var(--pal-sat) var(--pal-light)) var(--pal-border), var(--border));
+    color: color-mix(in srgb, var(--ac) 82%, var(--fg));
+    background: color-mix(in srgb, var(--ac) 16%, var(--card));
+    border: 1px solid color-mix(in srgb, var(--ac) 45%, var(--border));
   }
 
   .note-excerpt { margin: 0; font-size: 0.86rem; color: var(--fg); flex-grow: 1; min-height: 1.3em; }
@@ -301,19 +350,23 @@
   .palette-trigger:hover, .palette-picker.open .palette-trigger { opacity: 1; background: var(--card-hover); }
   .palette-menu {
     position: absolute; top: calc(100% + 0.5rem); right: 0;
-    display: flex; gap: 0.45rem;
-    background: var(--card); border: 1px solid var(--border); border-radius: 999px;
-    padding: 0.45rem; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    display: flex; flex-direction: column; gap: 0.2rem; min-width: 128px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 0.35rem; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   }
   .palette-menu[hidden] { display: none; }
-  .palette-swatch {
-    width: 18px; height: 18px; border-radius: 50%; border: 1px solid var(--border);
-    cursor: pointer; padding: 0;
+  .palette-option {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.4rem 0.55rem; border-radius: 8px; border: none; background: none;
+    color: var(--fg); font-size: 0.78rem; font-weight: 600; text-align: left;
+    cursor: pointer; font-family: inherit;
   }
-  .palette-swatch[data-palette="sutil"] { background: hsl(212 28% 46%); }
-  .palette-swatch[data-palette="cyberpunk"] { background: hsl(300 100% 55%); box-shadow: 0 0 6px hsl(300 100% 55% / 0.7); }
-  .palette-swatch[data-palette="solarpunk"] { background: hsl(95 55% 40%); }
-  .palette-swatch.active { outline: 2px solid var(--fg); outline-offset: 2px; }
+  .palette-option:hover { background: var(--card-hover); }
+  .palette-option.active { background: color-mix(in srgb, var(--accent) 16%, var(--card)); }
+  .palette-dot { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
+  .palette-dot[data-palette="estandar"] { background: #007AFF; }
+  .palette-dot[data-palette="cyberpunk"] { background: #00FFFF; box-shadow: 0 0 5px rgba(0, 255, 255, 0.7); }
+  .palette-dot[data-palette="solarpunk"] { background: #2A7B50; }
 </style>
 </head>
 <body>
@@ -327,9 +380,9 @@
     </svg>
   </button>
   <div class="palette-menu" id="palette-menu" hidden>
-    <button type="button" class="palette-swatch" data-palette="sutil" title="Sutil"></button>
-    <button type="button" class="palette-swatch" data-palette="cyberpunk" title="Cyberpunk"></button>
-    <button type="button" class="palette-swatch" data-palette="solarpunk" title="Solarpunk"></button>
+    <button type="button" class="palette-option" data-palette="estandar"><span class="palette-dot" data-palette="estandar"></span>Estándar</button>
+    <button type="button" class="palette-option" data-palette="cyberpunk"><span class="palette-dot" data-palette="cyberpunk"></span>Cyberpunk</button>
+    <button type="button" class="palette-option" data-palette="solarpunk"><span class="palette-dot" data-palette="solarpunk"></span>Solarpunk</button>
   </div>
 </div>
 <main>
