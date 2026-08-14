@@ -282,17 +282,30 @@
     return hay.includes(q.toLowerCase());
   }
 
+  // Hash determinístico string -> hue (0-359), para que cada dominio
+  // tenga siempre el mismo color sin tener que mantener un mapa a mano.
+  function domainHue(domain) {
+    let hash = 0;
+    for (let i = 0; i < domain.length; i++) {
+      hash = (hash * 31 + domain.charCodeAt(i)) >>> 0;
+    }
+    return hash % 360;
+  }
+
   function noteCard(note) {
     const thumb = note.portada
       ? `<img class="note-thumb" src="${escapeHtml(note.portada)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
       : "";
+    const hue = domainHue(note.domain);
     return `
       <div class="note-card" tabindex="0" data-path="${escapeHtml(note.path)}">
         ${thumb}
         <div class="note-head">
           <span class="note-title">${escapeHtml(note.title)}</span>
-          <span class="note-domain">${escapeHtml(note.domain)}</span>
-          ${note.tipo ? `<span class="badge">${escapeHtml(note.tipo)}</span>` : ""}
+          <div class="badge-row">
+            ${note.tipo ? `<span class="badge-tipo" style="--hue: ${hue}">${escapeHtml(note.tipo)}</span>` : ""}
+            <span class="badge-domain" style="--hue: ${hue}">${escapeHtml(note.domain)}</span>
+          </div>
         </div>
         <p class="note-excerpt ${note.excerpt ? "" : "empty"}">${escapeHtml(note.excerpt || "Sin resumen")}</p>
         ${note.fechaArchivado ? `<div class="note-stats"><span>${escapeHtml(note.fechaArchivado)}</span></div>` : ""}

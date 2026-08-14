@@ -153,10 +153,28 @@
     border-radius: 8px; border: 1px solid var(--border);
     background: var(--code-bg);
   }
-  .note-head { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+  .note-head { display: flex; flex-direction: column; align-items: flex-start; gap: 0.35rem; width: 100%; }
   .note-title { font-size: 0.98rem; font-weight: 700; color: var(--fg); word-break: break-word; }
-  .note-domain { font-size: 0.78rem; color: var(--muted); display: block; margin-top: 0.1rem; }
   .badge { font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.5rem; border-radius: 999px; max-width: 100%; background: var(--code-bg); color: var(--muted); }
+
+  /* Fila tipo (izq., tinte/borde) + dominio (der., relleno sólido) —
+     mismo --hue por nota, así queda claro que están relacionados pero
+     el relleno marca cuál es "categoría" (dominio) y cuál "tipo". */
+  .badge-row { display: flex; align-items: center; width: 100%; gap: 0.5rem; }
+  .badge-tipo, .badge-domain {
+    font-size: 0.68rem; font-weight: 600; padding: 0.2rem 0.55rem;
+    border-radius: 999px; white-space: nowrap; line-height: 1.4;
+  }
+  .badge-domain {
+    margin-left: auto;
+    color: #fff;
+    background: hsl(var(--hue) 60% 40%);
+  }
+  .badge-tipo {
+    color: color-mix(in srgb, hsl(var(--hue) 75% 50%) 80%, var(--fg) 20%);
+    background: color-mix(in srgb, hsl(var(--hue) 75% 50%) 16%, var(--card) 84%);
+    border: 1px solid color-mix(in srgb, hsl(var(--hue) 75% 50%) 45%, var(--border) 55%);
+  }
 
   .note-excerpt { margin: 0; font-size: 0.86rem; color: var(--fg); flex-grow: 1; min-height: 1.3em; }
   .note-excerpt.empty { color: var(--muted); font-style: italic; }
