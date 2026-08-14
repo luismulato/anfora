@@ -1,5 +1,7 @@
-// Ánfora — catálogo que lee los .md en vivo (fetch), sin contenido
-// pre-generado. files.json es solo una lista de rutas relativas.
+// Ánfora — catálogo que lee las notas desde notes-data.js
+// (window.ANFORA_NOTES, generado por refresh-anfora-local.sh /
+// publicar-anfora-on-github.sh). Sin fetch() a propósito, para poder
+// abrirse con doble-click (file://) sin necesitar servidor.
 
 (async function () {
   const grid = document.getElementById("grid");
@@ -15,6 +17,7 @@
 
   let notes = [];
   let activeDomain = "all";
+  let domainAccentMap = {}; // dominio -> índice de acento (0-2), por posición ordenada
   let sortBy = "date";
   let sortDir = SORT_DEFAULT_DIR[sortBy];
 
@@ -278,8 +281,15 @@
 
   function buildFilters() {
     const domains = [...new Set(notes.map((n) => n.domain))].sort();
+    // Índice por posición ordenada, no por hash — con hash, dos
+    // dominios pueden caer en el mismo accent-N por pura coincidencia
+    // (ej. "neurociencia" y "systems-thinking" mod 3). Por posición,
+    // mientras haya <= 3 dominios, los 3 acentos quedan siempre
+    // distintos.
+    domainAccentMap = {};
+    domains.forEach((d, i) => { domainAccentMap[d] = i % 3; });
     filtersEl.innerHTML = `<span class="filter-chip active" data-domain="all">Todas</span>` +
-      domains.map((d) => `<span class="filter-chip domain-chip accent-${domainAccentIndex(d)}" data-domain="${escapeHtml(d)}">${escapeHtml(d)}</span>`).join("");
+      domains.map((d) => `<span class="filter-chip domain-chip accent-${domainAccentMap[d]}" data-domain="${escapeHtml(d)}">${escapeHtml(d)}</span>`).join("");
 
     filtersEl.querySelectorAll(".filter-chip").forEach((chip) => {
       chip.addEventListener("click", () => {
@@ -345,22 +355,11 @@
     return hay.includes(q.toLowerCase());
   }
 
-  // Hash determinístico string -> índice 0-2, para elegir siempre el
-  // mismo acento (de los 3 que define la paleta activa) por dominio,
-  // sin mantener un mapa a mano.
-  function domainAccentIndex(domain) {
-    let hash = 0;
-    for (let i = 0; i < domain.length; i++) {
-      hash = (hash * 31 + domain.charCodeAt(i)) >>> 0;
-    }
-    return hash % 3;
-  }
-
   function noteCard(note) {
     const thumb = note.portada
       ? `<img class="note-thumb" src="${escapeHtml(note.portada)}" alt="" loading="lazy" referrerpolicy="no-referrer">`
       : "";
-    const accentClass = `accent-${domainAccentIndex(note.domain)}`;
+    const accentClass = `accent-${domainAccentMap[note.domain] ?? 0}`;
     return `
       <div class="note-card" tabindex="0" data-path="${escapeHtml(note.path)}">
         ${thumb}
