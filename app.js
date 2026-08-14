@@ -1,7 +1,5 @@
-// Ánfora — catálogo que lee las notas desde notes-data.js
-// (window.ANFORA_NOTES, generado por refresh-anfora-local.sh /
-// publicar-anfora-on-github.sh). Sin fetch() a propósito, para poder
-// abrirse con doble-click (file://) sin necesitar servidor.
+// Ánfora — catálogo que lee los .md en vivo (fetch), sin contenido
+// pre-generado. files.json es solo una lista de rutas relativas.
 
 (async function () {
   const grid = document.getElementById("grid");
