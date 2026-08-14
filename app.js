@@ -8,6 +8,8 @@
   const searchInput = document.getElementById("search-input");
   const sortSelect = document.getElementById("sort-select");
   const sortDirBtn = document.getElementById("sort-dir-btn");
+  const influencersGrid = document.getElementById("influencers-grid");
+  const influencersCount = document.getElementById("influencers-count");
 
   const SORT_DEFAULT_DIR = { title: 1, date: -1, domain: 1, tipo: 1 };
 
@@ -149,6 +151,9 @@
     let fuente = null;
     let fechaArchivado = null;
     let tipo = null;
+    let canalNombre = null;
+    let canalUrl = null;
+    let canalInfo = null;
     let bodyStartIdx = 0;
 
     for (let i = 0; i < lines.length; i++) {
@@ -166,7 +171,9 @@
       if (fe) { fechaArchivado = fe[1].trim(); continue; }
       const ti = line.match(/^\*\*Tipo:\*\*\s*(.*)$/);
       if (ti) { tipo = ti[1].trim(); continue; }
-      const isMetaLine = h1 || img || fu || fe || ti || line.trim() === "";
+      const ca = line.match(/^\*\*Canal:\*\*\s*\[([^\]]+)\]\(([^)]+)\)(?:\s*—\s*(.*))?$/);
+      if (ca) { canalNombre = ca[1].trim(); canalUrl = ca[2].trim(); canalInfo = (ca[3] || "").trim(); continue; }
+      const isMetaLine = h1 || img || fu || fe || ti || ca || line.trim() === "";
       if (!isMetaLine) { bodyStartIdx = i; break; }
     }
 
@@ -187,7 +194,7 @@
 
     const domain = path.split("/")[0];
 
-    return { path, title, portada, fuente, fechaArchivado, tipo, domain, excerpt, bodyMd };
+    return { path, title, portada, fuente, fechaArchivado, tipo, canalNombre, canalUrl, canalInfo, domain, excerpt, bodyMd };
   }
 
   async function loadNotes() {
@@ -219,6 +226,31 @@
         render();
       });
     });
+  }
+
+  /* --- Tab Influencers: agrupa notas por canal de YouTube (**Canal:** en la nota) --- */
+  function buildInfluencers() {
+    const byChannel = new Map();
+    for (const n of notes) {
+      if (!n.canalUrl) continue;
+      const prev = byChannel.get(n.canalUrl);
+      if (!prev || (n.fechaArchivado || "") >= (prev.fechaArchivado || "")) {
+        byChannel.set(n.canalUrl, { nombre: n.canalNombre, url: n.canalUrl, info: n.canalInfo, fechaArchivado: n.fechaArchivado, count: (prev ? prev.count : 0) + 1 });
+      } else {
+        prev.count += 1;
+      }
+    }
+    const channels = [...byChannel.values()].sort((a, b) => b.count - a.count);
+
+    influencersCount.textContent = `${channels.length} canal${channels.length === 1 ? "" : "es"}`;
+    influencersGrid.innerHTML = channels.length
+      ? channels.map((c) => `
+        <div class="note-card channel-card">
+          <span class="channel-name"><a href="${escapeHtml(c.url)}" target="_blank" rel="noopener">${escapeHtml(c.nombre || c.url)}</a></span>
+          <span class="channel-stats">${c.count} video${c.count === 1 ? "" : "s"} en Ánfora</span>
+          ${c.info ? `<p class="channel-info">${escapeHtml(c.info)}</p>` : ""}
+        </div>`).join("")
+      : `<div class="empty-state">Todavía no hay notas con canal identificado.</div>`;
   }
 
   function sortKey(n) {
@@ -326,11 +358,21 @@
     render();
   });
 
+  document.getElementById("view-tabs").querySelectorAll(".view-tab").forEach((tab) => {
+    tab.addEventListener("click", () => {
+      document.querySelectorAll(".view-tab").forEach((t) => t.classList.remove("active"));
+      tab.classList.add("active");
+      document.getElementById("view-notas").hidden = tab.dataset.view !== "notas";
+      document.getElementById("view-influencers").hidden = tab.dataset.view !== "influencers";
+    });
+  });
+
   try {
     notes = await loadNotes();
     updateSortDirBtn();
     buildFilters();
     render();
+    buildInfluencers();
   } catch (err) {
     grid.innerHTML = `<div class="error-state">No se pudieron cargar las notas: ${escapeHtml(err.message)}</div>`;
   }

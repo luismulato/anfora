@@ -78,6 +78,27 @@
   .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
   .result-count { font-size: 0.85rem; color: var(--muted); margin: 0.25rem 0 1.5rem; }
 
+  .view-tabs { display: flex; gap: 0.5rem; margin-bottom: 1.25rem; }
+  .view-tab {
+    font-size: 0.88rem; font-weight: 600;
+    padding: 0.5rem 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .view-tab:hover { background: var(--card-hover); }
+  .view-tab.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .view-panel[hidden] { display: none; }
+
+  .channel-card { display: flex; flex-direction: column; gap: 0.4rem; }
+  .channel-name { font-size: 1rem; font-weight: 700; color: var(--fg); }
+  .channel-name a { color: inherit; text-decoration: none; }
+  .channel-name a:hover { color: var(--accent); }
+  .channel-stats { font-size: 0.8rem; color: var(--muted); }
+  .channel-info { font-size: 0.86rem; color: var(--fg); }
+
   .sort-bar { display: flex; align-items: center; gap: 0.4rem; }
   .sort-bar label { font-size: 0.82rem; color: var(--muted); }
   .sort-select {
@@ -202,30 +223,42 @@
   <h1>Ánfora</h1>
   <p class="lead">Notas archivadas sobre IA y pensamiento sistémico. Esta página lee los archivos <code>.md</code> del repo en vivo — no hay contenido duplicado ni pre-generado.</p>
 
-  <div class="search-bar">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/></svg>
-    <input type="text" id="search-input" placeholder="Buscar notas por título, fuente o contenido…" autocomplete="off">
+  <div class="view-tabs" id="view-tabs">
+    <button type="button" class="view-tab active" data-view="notas">Notas</button>
+    <button type="button" class="view-tab" data-view="influencers">Influencers</button>
   </div>
-  <div class="toolbar-row">
-    <div class="filters" id="filters">
-      <span class="filter-chip active" data-domain="all">Todas</span>
-    </div>
-    <div class="sort-bar">
-      <label for="sort-select">Ordenar por</label>
-      <select class="sort-select" id="sort-select">
-        <option value="date">Más reciente</option>
-        <option value="title">Alfabético</option>
-        <option value="domain">Dominio</option>
-        <option value="tipo">Tipo</option>
-      </select>
-      <button type="button" class="sort-dir-btn" id="sort-dir-btn" title="Cambiar dirección">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="6 14 12 20 18 14"/></svg>
-      </button>
-    </div>
-  </div>
-  <p class="result-count" id="result-count"></p>
 
-  <div class="grid" id="grid"></div>
+  <div class="view-panel" id="view-notas">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/></svg>
+      <input type="text" id="search-input" placeholder="Buscar notas por título, fuente o contenido…" autocomplete="off">
+    </div>
+    <div class="toolbar-row">
+      <div class="filters" id="filters">
+        <span class="filter-chip active" data-domain="all">Todas</span>
+      </div>
+      <div class="sort-bar">
+        <label for="sort-select">Ordenar por</label>
+        <select class="sort-select" id="sort-select">
+          <option value="date">Más reciente</option>
+          <option value="title">Alfabético</option>
+          <option value="domain">Dominio</option>
+          <option value="tipo">Tipo</option>
+        </select>
+        <button type="button" class="sort-dir-btn" id="sort-dir-btn" title="Cambiar dirección">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="4" x2="12" y2="20"/><polyline points="6 14 12 20 18 14"/></svg>
+        </button>
+      </div>
+    </div>
+    <p class="result-count" id="result-count"></p>
+
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <div class="view-panel" id="view-influencers" hidden>
+    <p class="result-count" id="influencers-count"></p>
+    <div class="grid" id="influencers-grid"></div>
+  </div>
 
   <footer>
     <a href="https://github.com/luismulato/anfora" target="_blank" rel="noopener">Código fuente en GitHub</a>
