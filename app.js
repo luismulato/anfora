@@ -322,15 +322,37 @@
   const modalBody = document.getElementById("modal-body");
   const modalClose = document.getElementById("modal-close");
 
+  function youtubeEmbedUrl(url) {
+    if (!url) return null;
+    const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{6,})/);
+    return m ? { embedUrl: `https://www.youtube.com/embed/${m[1]}`, isShort: /\/shorts\//.test(url) } : null;
+  }
+
   function openModal(note) {
     if (!note) return;
     modalTitle.textContent = note.title;
     const metaParts = [];
     if (note.tipo) metaParts.push(`<span class="badge">${escapeHtml(note.tipo)}</span>`);
     if (note.fechaArchivado) metaParts.push(escapeHtml(note.fechaArchivado));
-    if (note.fuente) metaParts.push(`<a href="${escapeHtml(note.fuente)}" target="_blank" rel="noopener">Fuente ↗</a>`);
+    if (note.fuente) {
+      metaParts.push(`<span class="fuente-group"><a href="${escapeHtml(note.fuente)}" target="_blank" rel="noopener">Fuente ↗</a><button type="button" class="copy-link-btn" data-url="${escapeHtml(note.fuente)}" title="Copiar link" aria-label="Copiar link de la fuente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span>`);
+    }
     modalMeta.innerHTML = metaParts.join(" · ");
-    modalBody.innerHTML = `<div class="note-body">${renderMarkdown(note.bodyMd)}</div>`;
+    modalMeta.querySelectorAll(".copy-link-btn").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(btn.dataset.url);
+          btn.classList.add("copied");
+          setTimeout(() => btn.classList.remove("copied"), 1200);
+        } catch (e) { /* clipboard no disponible, no-op */ }
+      });
+    });
+
+    const yt = youtubeEmbedUrl(note.fuente);
+    const embedHtml = yt
+      ? `<div class="note-embed${yt.isShort ? " portrait" : ""}"><iframe src="${escapeHtml(yt.embedUrl)}" title="Video embebido" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe></div>`
+      : "";
+    modalBody.innerHTML = `<div class="note-body">${renderMarkdown(note.bodyMd)}</div>${embedHtml}`;
     modalOverlay.classList.add("open");
     modalClose.focus();
   }
