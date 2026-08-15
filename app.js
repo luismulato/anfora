@@ -1,5 +1,7 @@
-// Ánfora — catálogo que lee los .md en vivo (fetch), sin contenido
-// pre-generado. files.json es solo una lista de rutas relativas.
+// Ánfora — catálogo que lee las notas desde notes-data.js
+// (window.ANFORA_NOTES, generado por refresh-anfora-local.sh /
+// publicar-anfora-on-github.sh). Sin fetch() a propósito, para poder
+// abrirse con doble-click (file://) sin necesitar servidor.
 
 (async function () {
   const grid = document.getElementById("grid");
@@ -261,20 +263,9 @@
     return { path, title, portada, fuente, fechaArchivado, tipo, canalNombre, canalUrl, canalInfo, domain, excerpt, bodyMd };
   }
 
-  async function loadNotes() {
-    const manifestRes = await fetch("files.json", { cache: "no-store" });
-    if (!manifestRes.ok) throw new Error("No se pudo cargar files.json");
-    const paths = await manifestRes.json();
-
-    const loaded = await Promise.all(
-      paths.map(async (path) => {
-        const res = await fetch(path, { cache: "no-store" });
-        if (!res.ok) return null;
-        const raw = await res.text();
-        return parseNote(path, raw);
-      })
-    );
-    return loaded.filter(Boolean);
+  function loadNotes() {
+    const rawByPath = window.ANFORA_NOTES || {};
+    return Object.entries(rawByPath).map(([path, raw]) => parseNote(path, raw));
   }
 
   function buildFilters() {
