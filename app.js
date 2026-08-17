@@ -4,6 +4,8 @@
 // abrirse con doble-click (file://) sin necesitar servidor.
 
 (async function () {
+  const { escapeHtml, renderMarkdown, copyToClipboard, flashCopied, createModal, bindFilterChips } = window.CatalogBehavior;
+
   const grid = document.getElementById("grid");
   const filtersEl = document.getElementById("filters");
   const resultCount = document.getElementById("result-count");
@@ -84,14 +86,6 @@
   });
   applyTheme();
 
-  function escapeHtml(s) {
-    return (s || "")
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;");
-  }
-
   // Los atributos HTML crudos en las notas (ej. <img src="...&amp;...">)
   // vienen ya HTML-escapados. Hay que decodificarlos antes de reusar el
   // valor como string plano (URL), o escapeHtml lo escapa doble.
@@ -104,109 +98,14 @@
       .replace(/&#39;/g, "'");
   }
 
-  /* --- Mini renderer Markdown -> HTML (sin dependencias externas) --- */
-  function renderInline(text) {
-    let t = escapeHtml(text);
-    t = t.replace(/`([^`]+)`/g, "<code>$1</code>");
-    t = t.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
-    t = t.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, "<em>$1</em>");
-    t = t.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
-    return t;
-  }
-
-  function renderMarkdown(md) {
-    const lines = (md || "").split("\n");
-    let html = "";
-    let inCode = false;
-    let listType = null;
-    let tableRows = null;
-    const closeList = () => {
-      if (listType) { html += `</${listType}>`; listType = null; }
-    };
-    const isTableRow = (l) => /^\s*\|.*\|\s*$/.test(l);
-    const isTableSep = (l) => /^\s*\|?(\s*:?-+:?\s*\|)+\s*:?-+:?\s*\|?\s*$/.test(l);
-    const parseTableRow = (l) => l.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((c) => c.trim());
-    const flushTable = () => {
-      if (!tableRows) return;
-      if (tableRows.length < 2 || !isTableSep(tableRows[1])) {
-        for (const l of tableRows) html += `<p>${renderInline(l.trim())}</p>`;
-        tableRows = null;
-        return;
-      }
-      const header = parseTableRow(tableRows[0]);
-      const bodyRows = tableRows.slice(2).map(parseTableRow);
-      html += "<table><thead><tr>" +
-        header.map((c) => `<th>${renderInline(c)}</th>`).join("") +
-        "</tr></thead><tbody>" +
-        bodyRows.map((r) => "<tr>" + r.map((c) => `<td>${renderInline(c)}</td>`).join("") + "</tr>").join("") +
-        "</tbody></table>";
-      tableRows = null;
-    };
-
-    for (const rawLine of lines) {
-      const line = rawLine.replace(/\r$/, "");
-
-      // Passthrough para la imagen de portada (<img ...>), la única
-      // etiqueta HTML cruda que usan las notas de Ánfora. Se fuerza
-      // referrerpolicy="no-referrer" porque algunas fuentes bloquean
-      // la carga si detectan un Referer de otro dominio (hotlinking).
-      if (/^\s*<img\s/i.test(line)) {
-        closeList();
-        html += line.trim().replace(/^<img /i, '<img referrerpolicy="no-referrer" ');
-        continue;
-      }
-
-      if (line.trim().startsWith("```")) {
-        if (!inCode) {
-          closeList();
-          html += "<pre><code>";
-          inCode = true;
-        } else {
-          html += "</code></pre>";
-          inCode = false;
-        }
-        continue;
-      }
-      if (inCode) {
-        html += escapeHtml(line) + "\n";
-        continue;
-      }
-
-      if (isTableRow(line)) {
-        tableRows = tableRows ? [...tableRows, line] : [line];
-        continue;
-      }
-      if (tableRows) flushTable();
-
-      const heading = line.match(/^(#{1,4})\s+(.*)$/);
-      if (heading) {
-        closeList();
-        const level = heading[1].length;
-        html += `<h${level}>${renderInline(heading[2])}</h${level}>`;
-        continue;
-      }
-
-      const ordered = line.match(/^\s*\d+\.\s+(.*)$/);
-      const unordered = line.match(/^\s*[-*]\s+(.*)$/);
-      if (ordered || unordered) {
-        const tag = ordered ? "ol" : "ul";
-        if (listType !== tag) {
-          closeList();
-          html += `<${tag}>`;
-          listType = tag;
-        }
-        html += `<li>${renderInline((ordered || unordered)[1])}</li>`;
-        continue;
-      }
-      closeList();
-
-      if (line.trim() === "") continue;
-      html += `<p>${renderInline(line)}</p>`;
-    }
-    closeList();
-    flushTable();
-    if (inCode) html += "</code></pre>";
-    return html;
+  // escapeHtml / renderMarkdown ahora vienen de catalog-behavior.js.
+  // La única etiqueta HTML cruda que usan las notas de Ánfora es el
+  // <img> de portada (renderMarkdown con allowRawImgTag: true la deja
+  // pasar tal cual) — acá se le fuerza referrerpolicy="no-referrer"
+  // sobre el HTML ya renderizado, porque algunas fuentes bloquean la
+  // carga si detectan un Referer de otro dominio (hotlinking).
+  function renderNoteBody(md) {
+    return renderMarkdown(md, { allowRawImgTag: true }).replace(/<img /gi, '<img referrerpolicy="no-referrer" ');
   }
 
   /* --- Parseo liviano del header de cada nota --- */
@@ -280,13 +179,8 @@
     filtersEl.innerHTML = `<span class="filter-chip active" data-domain="all">Todas</span>` +
       domains.map((d) => `<span class="filter-chip domain-chip accent-${domainAccentMap[d]}" data-domain="${escapeHtml(d)}">${escapeHtml(d)}</span>`).join("");
 
-    filtersEl.querySelectorAll(".filter-chip").forEach((chip) => {
-      chip.addEventListener("click", () => {
-        activeDomain = chip.dataset.domain;
-        filtersEl.querySelectorAll(".filter-chip").forEach((c) => c.classList.remove("active"));
-        chip.classList.add("active");
-        render();
-      });
+    bindFilterChips(filtersEl, {
+      onSelect: (ds) => { activeDomain = ds.domain; render(); },
     });
   }
 
@@ -307,7 +201,7 @@
     influencersCount.textContent = `${channels.length} canal${channels.length === 1 ? "" : "es"}`;
     influencersGrid.innerHTML = channels.length
       ? channels.map((c) => `
-        <div class="note-card channel-card">
+        <div class="item-card channel-card">
           <span class="channel-name"><a href="${escapeHtml(c.url)}" target="_blank" rel="noopener">${escapeHtml(c.nombre || c.url)}</a></span>
           <span class="channel-stats">${c.count} video${c.count === 1 ? "" : "s"} en Ánfora</span>
           ${c.info ? `<p class="channel-info">${escapeHtml(c.info)}</p>` : ""}
@@ -350,17 +244,17 @@
       : "";
     const accentClass = `accent-${domainAccentMap[note.domain] ?? 0}`;
     return `
-      <div class="note-card" tabindex="0" data-path="${escapeHtml(note.path)}">
+      <div class="item-card" tabindex="0" data-path="${escapeHtml(note.path)}">
         ${thumb}
         <div class="note-head">
-          <span class="note-title">${escapeHtml(note.title)}</span>
+          <span class="item-title">${escapeHtml(note.title)}</span>
           <div class="badge-row">
             ${note.tipo ? `<span class="badge-tipo ${accentClass}">${escapeHtml(note.tipo)}</span>` : ""}
             <span class="badge-domain ${accentClass}">${escapeHtml(note.domain)}</span>
           </div>
         </div>
-        <p class="note-excerpt ${note.excerpt ? "" : "empty"}">${escapeHtml(note.excerpt || "Sin resumen")}</p>
-        ${note.fechaArchivado ? `<div class="note-stats"><span>${escapeHtml(note.fechaArchivado)}</span></div>` : ""}
+        <p class="item-desc ${note.excerpt ? "" : "empty"}">${escapeHtml(note.excerpt || "Sin resumen")}</p>
+        ${note.fechaArchivado ? `<div class="item-stats"><span>${escapeHtml(note.fechaArchivado)}</span></div>` : ""}
       </div>`;
   }
 
@@ -374,18 +268,20 @@
       ? sorted.map(noteCard).join("")
       : `<div class="empty-state">No hay notas que coincidan.</div>`;
 
-    grid.querySelectorAll(".note-card").forEach((card) => {
+    grid.querySelectorAll(".item-card").forEach((card) => {
       const open = () => openModal(notes.find((n) => n.path === card.dataset.path));
       card.addEventListener("click", open);
       card.addEventListener("keydown", (e) => { if (e.key === "Enter") open(); });
     });
   }
 
-  const modalOverlay = document.getElementById("modal-overlay");
-  const modalTitle = document.getElementById("modal-title");
-  const modalMeta = document.getElementById("modal-meta");
-  const modalBody = document.getElementById("modal-body");
-  const modalClose = document.getElementById("modal-close");
+  const modal = createModal({
+    overlayId: "modal-overlay",
+    titleId: "modal-title",
+    metaId: "modal-meta",
+    bodyId: "modal-body",
+    closeId: "modal-close",
+  });
 
   function youtubeEmbedUrl(url) {
     if (!url) return null;
@@ -395,40 +291,30 @@
 
   function openModal(note) {
     if (!note) return;
-    modalTitle.textContent = note.title;
     const metaParts = [];
     if (note.tipo) metaParts.push(`<span class="badge">${escapeHtml(note.tipo)}</span>`);
     if (note.fechaArchivado) metaParts.push(escapeHtml(note.fechaArchivado));
     if (note.fuente) {
       metaParts.push(`<span class="fuente-group"><a href="${escapeHtml(note.fuente)}" target="_blank" rel="noopener">Fuente ↗</a><button type="button" class="copy-link-btn" data-url="${escapeHtml(note.fuente)}" title="Copiar link" aria-label="Copiar link de la fuente"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg></button></span>`);
     }
-    modalMeta.innerHTML = metaParts.join(" · ");
-    modalMeta.querySelectorAll(".copy-link-btn").forEach((btn) => {
-      btn.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(btn.dataset.url);
-          btn.classList.add("copied");
-          setTimeout(() => btn.classList.remove("copied"), 1200);
-        } catch (e) { /* clipboard no disponible, no-op */ }
-      });
-    });
 
     const yt = youtubeEmbedUrl(note.fuente);
     const embedHtml = yt
       ? `<div class="note-embed${yt.isShort ? " portrait" : ""}"><iframe src="${escapeHtml(yt.embedUrl)}" title="Video embebido" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy"></iframe></div>`
       : "";
-    modalBody.innerHTML = `<div class="note-body">${renderMarkdown(note.bodyMd)}</div>${embedHtml}`;
-    modalOverlay.classList.add("open");
-    modalClose.focus();
-  }
 
-  function closeModal() {
-    modalOverlay.classList.remove("open");
-  }
+    modal.open({
+      title: note.title,
+      metaHtml: metaParts.join(" · "),
+      bodyHtml: renderNoteBody(note.bodyMd) + embedHtml,
+    });
 
-  modalClose.addEventListener("click", closeModal);
-  modalOverlay.addEventListener("click", (e) => { if (e.target === modalOverlay) closeModal(); });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
+    document.querySelectorAll("#modal-meta .copy-link-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        copyToClipboard(btn.dataset.url).then(() => flashCopied(btn)).catch(() => {});
+      });
+    });
+  }
 
   searchInput.addEventListener("input", render);
 
