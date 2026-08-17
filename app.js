@@ -4,7 +4,7 @@
 // abrirse con doble-click (file://) sin necesitar servidor.
 
 (async function () {
-  const { escapeHtml, renderMarkdown, copyToClipboard, flashCopied, createModal, bindFilterChips } = window.CatalogBehavior;
+  const { escapeHtml, renderMarkdown, copyToClipboard, flashCopied, createModal, bindFilterChips, initPaletteSystem } = window.CatalogBehavior;
 
   const grid = document.getElementById("grid");
   const filtersEl = document.getElementById("filters");
@@ -23,68 +23,15 @@
   let sortBy = "date";
   let sortDir = SORT_DEFAULT_DIR[sortBy];
 
-  /* --- Paleta de colores por dominio: persistida, sin recargar --- */
-  const palettePicker = document.getElementById("palette-picker");
-  const paletteTrigger = document.getElementById("palette-trigger");
-  const paletteMenu = document.getElementById("palette-menu");
-  let palette = localStorage.getItem("anfora-palette") || "estandar";
-  document.documentElement.setAttribute("data-palette", palette);
-
-  function updatePaletteMenuUI() {
-    paletteMenu.querySelectorAll(".palette-option").forEach((opt) => {
-      opt.classList.toggle("active", opt.dataset.palette === palette);
-    });
-  }
-
-  function setPalette(p) {
-    palette = p;
-    document.documentElement.setAttribute("data-palette", p);
-    localStorage.setItem("anfora-palette", p);
-    updatePaletteMenuUI();
-  }
-
-  paletteTrigger.addEventListener("click", () => {
-    const willOpen = paletteMenu.hasAttribute("hidden");
-    if (willOpen) { paletteMenu.removeAttribute("hidden"); palettePicker.classList.add("open"); }
-    else { paletteMenu.setAttribute("hidden", ""); palettePicker.classList.remove("open"); }
+  /* --- Selector de paleta/tema: wiring genérico de catalog-behavior,
+     ver ~/Lab/toolkit/catalog-behavior/README.md. Los nombres/colores
+     de las 3 paletas (estandar/cyberpunk/solarpunk) son propios de
+     Ánfora, definidos en el <style> — initPaletteSystem no los conoce. --- */
+  initPaletteSystem({
+    paletteStorageKey: "anfora-palette",
+    themeStorageKey: "anfora-theme",
+    defaultPalette: "estandar",
   });
-  paletteMenu.querySelectorAll(".palette-option").forEach((opt) => {
-    opt.addEventListener("click", () => {
-      setPalette(opt.dataset.palette);
-      paletteMenu.setAttribute("hidden", "");
-      palettePicker.classList.remove("open");
-    });
-  });
-  document.addEventListener("click", (e) => {
-    if (!palettePicker.contains(e.target)) {
-      paletteMenu.setAttribute("hidden", "");
-      palettePicker.classList.remove("open");
-    }
-  });
-  updatePaletteMenuUI();
-
-  /* --- Tema claro/oscuro: override explícito sobre prefers-color-scheme --- */
-  const themeToggle = document.getElementById("theme-toggle");
-  let theme = localStorage.getItem("anfora-theme"); // "light" | "dark" | null (sigue al sistema)
-
-  function applyTheme() {
-    if (theme) document.documentElement.setAttribute("data-theme", theme);
-    else document.documentElement.removeAttribute("data-theme");
-    themeToggle.querySelectorAll(".theme-btn").forEach((b) => {
-      b.classList.toggle("active", b.dataset.theme === theme);
-    });
-  }
-
-  themeToggle.querySelectorAll(".theme-btn").forEach((b) => {
-    b.addEventListener("click", () => {
-      // Click de nuevo sobre el activo = volver a seguir el sistema.
-      theme = theme === b.dataset.theme ? null : b.dataset.theme;
-      if (theme) localStorage.setItem("anfora-theme", theme);
-      else localStorage.removeItem("anfora-theme");
-      applyTheme();
-    });
-  });
-  applyTheme();
 
   // Los atributos HTML crudos en las notas (ej. <img src="...&amp;...">)
   // vienen ya HTML-escapados. Hay que decodificarlos antes de reusar el

@@ -1,13 +1,16 @@
 <!--
-  Template: catalog-ui v1.1.0 (vendored) + catalog-behavior v1.0.0 (vendored)
+  Template: catalog-ui v1.2.0 (vendored, incluye palette-system.css
+  opcional) + catalog-behavior v1.1.0 (vendored, incluye
+  initPaletteSystem opcional)
   Fuente y docs: ~/Lab/toolkit/catalog-ui/ y ~/Lab/toolkit/catalog-behavior/
   (README.md, CHANGELOG.md en cada uno)
-  Para actualizar: comparar el bloque "catalog-ui vendored" del <style>
-  de abajo, y app.js, contra la versión más nueva de cada toolkit y,
-  si conviene, volver a copiar + subir el número acá arriba. Las
-  extensiones propias (sistema de 3 paletas, tabs, canales, badges de
-  tipo/dominio, embeds) van en sus bloques propios aparte, no se
-  tocan al upgradear.
+  Para actualizar: comparar los bloques "catalog-ui vendored" del
+  <style> de abajo, y app.js, contra la versión más nueva de cada
+  toolkit y, si conviene, volver a copiar + subir el número acá
+  arriba. Las extensiones propias (valores de color de las 3 paletas
+  estándar/cyberpunk/solarpunk, tabs, canales, badges de tipo/dominio,
+  embeds) van en sus bloques propios aparte, no se tocan al
+  upgradear.
 -->
 <!doctype html>
 <html lang="es">
@@ -16,7 +19,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Ánfora</title>
 <style>
-  /* ===== catalog-ui vendored (v1.1.0) ===== */
+  /* ===== catalog-ui vendored (v1.2.0) ===== */
   :root {
     color-scheme: light dark;
     --bg: #ffffff;
@@ -466,6 +469,101 @@
   .modal-body th { background: var(--card); font-weight: 600; }
 
 
+  /* ===== catalog-ui palette-system vendored (v1.2.0, opcional) ===== */
+  /*
+    catalog-ui v1.2.0 — palette-system.css (OPCIONAL)
+    Extraído de anfora (sistema de 3 paletas: estándar/cyberpunk/solarpunk)
+    el 2026-08-17. Docs: ~/Lab/toolkit/catalog-ui/README.md
+    Changelog: ~/Lab/toolkit/catalog-ui/CHANGELOG.md
+
+    Mecanismo genérico de theming multi-paleta + claro/oscuro explícito,
+    encima del sistema de tokens de catalog.css. Un consumidor que solo
+    quiere claro/oscuro automático (prefers-color-scheme) NO necesita
+    este archivo — catalog.css solo ya lo cubre. Este archivo es para
+    cuando además querés:
+
+    - Más de una paleta de color completa (no solo variantes de tono de
+      una), elegible por el usuario y persistida.
+    - Un toggle explícito claro/oscuro que gane sobre prefers-color-scheme.
+    - Una UI de selector (botón + menú) para elegir paleta/tema.
+
+    Wiring de comportamiento (abrir/cerrar menú, aplicar atributos,
+    persistir en localStorage): CatalogBehavior.initPaletteSystem, ver
+    ~/Lab/toolkit/catalog-behavior/README.md.
+
+    ===== Contrato: qué define cada app =====
+
+    catalog-ui NO trae paletas de color propias más allá del `:root`
+    base ya definido en catalog.css (esa es, en los hechos, la paleta
+    "default" de este sistema). Para agregar paletas adicionales, cada
+    app define sus propios bloques siguiendo este patrón exacto (ver
+    anfora como referencia real):
+
+      :root[data-palette="<nombre>"] {
+        --bg: ...; --fg: ...; --muted: ...; --border: ...;
+        --card: ...; --card-hover: ...; --accent: ...; --code-bg: ...;
+        --stat-fg: var(--muted);
+        --pal-accent-0: ...; --pal-accent-1: ...; --pal-accent-2: ...;
+        --pal-glow: none; /* o un box-shadow, ver cyberpunk en anfora */
+      }
+      @media (prefers-color-scheme: dark) {
+        :root[data-palette="<nombre>"]:not([data-theme="light"]) { ...mismos tokens, versión oscura... }
+      }
+      :root[data-palette="<nombre>"][data-theme="dark"] { ...mismos tokens, versión oscura... }
+
+    `--pal-accent-0/1/2` son 3 acentos curados por paleta — pensados
+    para que un ítem (nota, chip, badge) elija uno por hash/posición vía
+    `.accent-0/1/2` (abajo), no un hue calculado, así el resultado
+    siempre queda dentro de la combinación de colores de esa paleta.
+    `--pal-glow` es opcional — una paleta "neón" puede definir un
+    box-shadow ahí; el resto de las paletas lo dejan en `none`.
+  */
+
+  .accent-0 { --ac: var(--pal-accent-0, var(--accent)); }
+  .accent-1 { --ac: var(--pal-accent-1, var(--accent)); }
+  .accent-2 { --ac: var(--pal-accent-2, var(--accent)); }
+
+  /* --- Selector de paleta/tema (botón flotante + menú) --- */
+  .palette-picker { position: fixed; top: 1rem; right: 1rem; z-index: 200; }
+  .palette-trigger {
+    width: 28px; height: 28px; border-radius: 50%;
+    border: 1px solid var(--border); background: var(--card);
+    color: var(--muted); opacity: 0.45; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: opacity 0.15s ease, background 0.15s ease;
+  }
+  .palette-trigger svg { width: 14px; height: 14px; }
+  .palette-trigger:hover, .palette-picker.open .palette-trigger { opacity: 1; background: var(--card-hover); }
+  .palette-menu {
+    position: absolute; top: calc(100% + 0.5rem); right: 0;
+    display: flex; flex-direction: column; gap: 0.2rem; min-width: 128px;
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 0.35rem; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+  .palette-menu[hidden] { display: none; }
+  .palette-option {
+    display: flex; align-items: center; gap: 0.55rem;
+    padding: 0.4rem 0.55rem; border-radius: 8px; border: none; background: none;
+    color: var(--fg); font-size: 0.78rem; font-weight: 600; text-align: left;
+    cursor: pointer; font-family: inherit;
+  }
+  .palette-option:hover { background: var(--card-hover); }
+  .palette-option.active { background: color-mix(in srgb, var(--accent) 16%, var(--card)); }
+  .palette-dot { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
+  .palette-menu-divider { height: 1px; background: var(--border); margin: 0.3rem 0.1rem; }
+
+  /* --- Toggle claro/oscuro explícito, dentro del mismo menú --- */
+  .theme-toggle { display: flex; gap: 0.2rem; padding: 0.15rem; }
+  .theme-btn {
+    flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+    padding: 0.4rem 0; border-radius: 8px; border: none; background: none;
+    color: var(--muted); cursor: pointer; font-family: inherit;
+  }
+  .theme-btn svg { width: 14px; height: 14px; }
+  .theme-btn:hover { background: var(--card-hover); color: var(--fg); }
+  .theme-btn.active { background: color-mix(in srgb, var(--accent) 16%, var(--card)); color: var(--accent); }
+
+
   /* ===== extensiones propias de Ánfora (no vienen del toolkit) ===== */
   /* Tres sistemas de color completos (no variantes de tono de uno
      solo) — cada uno con su propio claro/oscuro. "Estándar" es el
@@ -606,12 +704,9 @@
     --pal-accent-2: #4A90E2;
   }
 
-  /* Cada nota/chip elige uno de los 3 acentos de la paleta activa por
-     hash de su dominio (accent-0/1/2), nunca un hue calculado. */
-  .accent-0 { --ac: var(--pal-accent-0); }
-  .accent-1 { --ac: var(--pal-accent-1); }
-  .accent-2 { --ac: var(--pal-accent-2); }
-
+  /* .accent-0/1/2 (mapea --ac a --pal-accent-N) viene del
+     palette-system.css vendoreado arriba — cada nota/chip lo usa por
+     hash de su dominio, nunca un hue calculado. */
   .filter-chip.domain-chip {
     color: var(--ac);
     border-color: color-mix(in srgb, var(--ac) 45%, var(--border));
@@ -692,46 +787,14 @@
   .note-embed.portrait { max-width: 320px; aspect-ratio: 9 / 16; margin-left: auto; margin-right: auto; }
   .note-embed iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
 
-  .palette-picker { position: fixed; top: 1rem; right: 1rem; z-index: 200; }
-  .palette-trigger {
-    width: 28px; height: 28px; border-radius: 50%;
-    border: 1px solid var(--border); background: var(--card);
-    color: var(--muted); opacity: 0.45; padding: 0;
-    display: flex; align-items: center; justify-content: center;
-    cursor: pointer; transition: opacity 0.15s ease, background 0.15s ease;
-  }
-  .palette-trigger svg { width: 14px; height: 14px; }
-  .palette-trigger:hover, .palette-picker.open .palette-trigger { opacity: 1; background: var(--card-hover); }
-  .palette-menu {
-    position: absolute; top: calc(100% + 0.5rem); right: 0;
-    display: flex; flex-direction: column; gap: 0.2rem; min-width: 128px;
-    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
-    padding: 0.35rem; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-  }
-  .palette-menu[hidden] { display: none; }
-  .palette-option {
-    display: flex; align-items: center; gap: 0.55rem;
-    padding: 0.4rem 0.55rem; border-radius: 8px; border: none; background: none;
-    color: var(--fg); font-size: 0.78rem; font-weight: 600; text-align: left;
-    cursor: pointer; font-family: inherit;
-  }
-  .palette-option:hover { background: var(--card-hover); }
-  .palette-option.active { background: color-mix(in srgb, var(--accent) 16%, var(--card)); }
+  /* UI del selector (.palette-picker/.palette-trigger/.palette-menu/
+     .palette-option/.theme-toggle/.theme-btn/.palette-menu-divider)
+     viene del palette-system.css vendoreado arriba. Acá solo el color
+     de la muestra (dot) de cada paleta propia. */
   .palette-dot { width: 13px; height: 13px; border-radius: 50%; flex-shrink: 0; }
   .palette-dot[data-palette="estandar"] { background: #007AFF; }
   .palette-dot[data-palette="cyberpunk"] { background: #00FFFF; box-shadow: 0 0 5px rgba(0, 255, 255, 0.7); }
   .palette-dot[data-palette="solarpunk"] { background: #2A7B50; }
-
-  .theme-toggle { display: flex; gap: 0.2rem; padding: 0.15rem; }
-  .theme-btn {
-    flex: 1; display: flex; align-items: center; justify-content: center; gap: 0.35rem;
-    padding: 0.4rem 0; border-radius: 8px; border: none; background: none;
-    color: var(--muted); cursor: pointer; font-family: inherit;
-  }
-  .theme-btn svg { width: 14px; height: 14px; }
-  .theme-btn:hover { background: var(--card-hover); color: var(--fg); }
-  .theme-btn.active { background: color-mix(in srgb, var(--accent) 16%, var(--card)); color: var(--accent); }
-  .palette-menu-divider { height: 1px; background: var(--border); margin: 0.3rem 0.1rem; }
 </style>
 </head>
 <body>

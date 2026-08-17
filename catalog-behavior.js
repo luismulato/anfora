@@ -1,4 +1,4 @@
-/* catalog-behavior v1.0.0 — companion JS de catalog-ui.
+/* catalog-behavior v1.1.0 — companion JS de catalog-ui.
    Funciones chicas, agnósticas a la forma de los datos de cada app.
    Sin build, sin dependencias, expone window.CatalogBehavior.
    Contrato completo: ~/Lab/toolkit/catalog-behavior/README.md */
@@ -230,6 +230,107 @@
     });
   }
 
+  /* --- Selector de paleta/tema (companion de catalog-ui/palette-system.css) ---
+     Wiring genérico: abre/cierra el menú, aplica data-palette/
+     data-theme al <html>, persiste en localStorage (con storage keys
+     configurables para que dos apps en el mismo origen no choquen), y
+     mantiene el estado activo del menú sincronizado. No conoce los
+     nombres/colores de las paletas — esos los define la app en su
+     propio CSS (ver catalog-ui/palette-system.css).
+
+     config: {
+       pickerId, triggerId, menuId, themeToggleId (default:
+         "palette-picker"/"palette-trigger"/"palette-menu"/"theme-toggle"),
+       paletteStorageKey, themeStorageKey (default: "catalog-palette"/"catalog-theme"),
+       defaultPalette (default: "default"),
+       onChange({palette, theme}) — opcional, se llama tras cada cambio.
+     }
+     Devuelve null si no encuentra el picker/trigger/menu en el DOM
+     (permite que una app sin selector de paleta llame esto sin
+     romper). Si encuentra todo, devuelve {getPalette, getTheme, setPalette}. */
+  function initPaletteSystem(config) {
+    config = config || {};
+    const picker = document.getElementById(config.pickerId || "palette-picker");
+    const trigger = document.getElementById(config.triggerId || "palette-trigger");
+    const menu = document.getElementById(config.menuId || "palette-menu");
+    const themeToggle = document.getElementById(config.themeToggleId || "theme-toggle");
+    if (!picker || !trigger || !menu) return null;
+
+    const paletteStorageKey = config.paletteStorageKey || "catalog-palette";
+    const themeStorageKey = config.themeStorageKey || "catalog-theme";
+    const defaultPalette = config.defaultPalette || "default";
+    const notify = () => { if (config.onChange) config.onChange({ palette, theme }); };
+
+    let palette = localStorage.getItem(paletteStorageKey) || defaultPalette;
+    document.documentElement.setAttribute("data-palette", palette);
+
+    function updateMenuUI() {
+      menu.querySelectorAll(".palette-option").forEach((opt) => {
+        opt.classList.toggle("active", opt.dataset.palette === palette);
+      });
+    }
+
+    function setPalette(p) {
+      palette = p;
+      document.documentElement.setAttribute("data-palette", p);
+      localStorage.setItem(paletteStorageKey, p);
+      updateMenuUI();
+      notify();
+    }
+
+    trigger.addEventListener("click", () => {
+      const willOpen = menu.hasAttribute("hidden");
+      if (willOpen) { menu.removeAttribute("hidden"); picker.classList.add("open"); }
+      else { menu.setAttribute("hidden", ""); picker.classList.remove("open"); }
+    });
+    menu.querySelectorAll(".palette-option").forEach((opt) => {
+      opt.addEventListener("click", () => {
+        setPalette(opt.dataset.palette);
+        menu.setAttribute("hidden", "");
+        picker.classList.remove("open");
+      });
+    });
+    document.addEventListener("click", (e) => {
+      if (!picker.contains(e.target)) {
+        menu.setAttribute("hidden", "");
+        picker.classList.remove("open");
+      }
+    });
+    updateMenuUI();
+
+    let theme = localStorage.getItem(themeStorageKey); // "light" | "dark" | null (sigue al sistema)
+
+    function applyTheme() {
+      if (theme) document.documentElement.setAttribute("data-theme", theme);
+      else document.documentElement.removeAttribute("data-theme");
+      if (themeToggle) {
+        themeToggle.querySelectorAll(".theme-btn").forEach((b) => {
+          b.classList.toggle("active", b.dataset.theme === theme);
+        });
+      }
+    }
+
+    if (themeToggle) {
+      themeToggle.querySelectorAll(".theme-btn").forEach((b) => {
+        b.addEventListener("click", () => {
+          // Click de nuevo sobre el activo = volver a seguir el sistema.
+          theme = theme === b.dataset.theme ? null : b.dataset.theme;
+          if (theme) localStorage.setItem(themeStorageKey, theme);
+          else localStorage.removeItem(themeStorageKey);
+          applyTheme();
+          notify();
+        });
+      });
+    }
+    applyTheme();
+
+    return {
+      getPalette: () => palette,
+      getTheme: () => theme,
+      setPalette,
+    };
+  }
+
   global.CatalogBehavior = {
     escapeHtml,
     renderInline,
@@ -238,5 +339,6 @@
     flashCopied,
     createModal,
     bindFilterChips,
+    initPaletteSystem,
   };
 })(window);
