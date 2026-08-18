@@ -1,4 +1,4 @@
-/* catalog-behavior v1.1.0 — companion JS de catalog-ui.
+/* catalog-behavior v1.3.0 — companion JS de catalog-ui.
    Funciones chicas, agnósticas a la forma de los datos de cada app.
    Sin build, sin dependencias, expone window.CatalogBehavior.
    Contrato completo: ~/Lab/toolkit/catalog-behavior/README.md */
@@ -16,10 +16,13 @@
   }
 
   /* --- Mini renderer Markdown -> HTML (sin dependencias externas) ---
-     Soporta: encabezados #-####, listas ordenadas/no ordenadas, bloques
-     de código ```, tablas GFM, y en línea: `code`, **bold**, *italic*,
-     [link](url). Con opts.allowRawImgTag: true, deja pasar tal cual una
-     línea que empiece con "<img " (uso de Ánfora para su portada) — por
+     Soporta: encabezados #-####, listas ordenadas/no ordenadas,
+     checkboxes "- [ ]"/"- [x]" (li.task/li.task.done — el contrato de
+     catalog.css desde 1.0.0, hasta ahora sin implementación
+     compartida), bloques de código ```, tablas GFM, y en línea:
+     `code`, **bold**, *italic*, [link](url). Con opts.allowRawImgTag:
+     true, deja pasar tal cual una línea que empiece con "<img " (uso
+     de Ánfora para su portada) — por
      default NO, para no inyectar HTML crudo sin que la app lo pida. */
   function renderInline(text) {
     let t = escapeHtml(text);
@@ -100,16 +103,22 @@
         continue;
       }
 
-      const ordered = line.match(/^\s*\d+\.\s+(.*)$/);
-      const unordered = line.match(/^\s*[-*]\s+(.*)$/);
-      if (ordered || unordered) {
+      const checkbox = line.match(/^\s*[-*]\s+\[( |x|X)\]\s+(.*)$/);
+      const ordered = !checkbox && line.match(/^\s*\d+\.\s+(.*)$/);
+      const unordered = !checkbox && !ordered && line.match(/^\s*[-*]\s+(.*)$/);
+      if (checkbox || ordered || unordered) {
         const tag = ordered ? "ol" : "ul";
         if (listType !== tag) {
           closeList();
           html += `<${tag}>`;
           listType = tag;
         }
-        html += `<li>${renderInline((ordered || unordered)[1])}</li>`;
+        if (checkbox) {
+          const checked = /x/i.test(checkbox[1]);
+          html += `<li class="task${checked ? " done" : ""}"><span class="task-box">${checked ? "☑" : "☐"}</span> ${renderInline(checkbox[2])}</li>`;
+        } else {
+          html += `<li>${renderInline((ordered || unordered)[1])}</li>`;
+        }
         continue;
       }
       closeList();
@@ -243,6 +252,14 @@
          "palette-picker"/"palette-trigger"/"palette-menu"/"theme-toggle"),
        paletteStorageKey, themeStorageKey (default: "catalog-palette"/"catalog-theme"),
        defaultPalette (default: "default"),
+       sharedThemeStorageKey — opcional, de solo lectura: si la app
+         todavía no tiene su propio theme guardado (primera vez, o
+         nunca tocó su toggle), se usa como default inicial en lugar
+         de seguir el sistema directamente. Pensado para que un shell
+         (ej. dashboard-ui, ver ~/Lab/toolkit/theme-picker/) le diga a
+         cada app embebida con qué tema arrancar, sin pisar la
+         elección propia de la app una vez que existe. Esta función
+         nunca escribe en esa key, solo la lee.
        onChange({palette, theme}) — opcional, se llama tras cada cambio.
      }
      Devuelve null si no encuentra el picker/trigger/menu en el DOM
@@ -299,6 +316,9 @@
     updateMenuUI();
 
     let theme = localStorage.getItem(themeStorageKey); // "light" | "dark" | null (sigue al sistema)
+    if (theme === null && config.sharedThemeStorageKey) {
+      theme = localStorage.getItem(config.sharedThemeStorageKey);
+    }
 
     function applyTheme() {
       if (theme) document.documentElement.setAttribute("data-theme", theme);
