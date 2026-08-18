@@ -6,7 +6,7 @@
 
 const { test } = require("node:test");
 const assert = require("node:assert/strict");
-const { noteHash, notePathFromHash } = require("../note-url.js");
+const { noteHash, notePathFromHash, publicNoteUrl } = require("../note-url.js");
 
 test("noteHash: arma #nota/<path> con el path url-encodeado", () => {
   assert.equal(noteHash("ia/nota-simple.md"), "#nota/ia%2Fnota-simple.md");
@@ -36,4 +36,23 @@ test("notePathFromHash: devuelve null si el hash está vacío", () => {
 test("notePathFromHash: devuelve null si el hash no es de una nota (#nota/...)", () => {
   assert.equal(notePathFromHash("#otra-cosa"), null);
   assert.equal(notePathFromHash("#"), null);
+});
+
+// Regresión del bug reportado: copiar/abrir el link de una nota tiene
+// que devolver siempre la URL pública (GitHub Pages), nunca una
+// derivada de location.* — porque si la app se abre con file:// o
+// embebida en un iframe del dashboard, location.origin/pathname son
+// una ruta de filesystem o del shell, no un link usable.
+test("publicNoteUrl: arma la URL pública a partir de una base fija, no de location", () => {
+  assert.equal(
+    publicNoteUrl("https://luismulato.github.io/anfora/", "ia/nota-simple.md"),
+    "https://luismulato.github.io/anfora/#nota/ia%2Fnota-simple.md"
+  );
+});
+
+test("publicNoteUrl: no duplica la barra si la base ya no termina en /", () => {
+  assert.equal(
+    publicNoteUrl("https://luismulato.github.io/anfora", "ia/nota-simple.md"),
+    "https://luismulato.github.io/anfora/#nota/ia%2Fnota-simple.md"
+  );
 });

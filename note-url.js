@@ -24,5 +24,14 @@
     return decodeURIComponent(raw);
   }
 
-  return { noteHash, notePathFromHash };
+  // Siempre a partir de baseUrl (la URL pública real del sitio,
+  // fija en el código de la app) — nunca de location.*, que en
+  // file:// es una ruta de filesystem y dentro del iframe de un
+  // dashboard es la URL del shell, no la de la nota.
+  function publicNoteUrl(baseUrl, path) {
+    const base = baseUrl.endsWith("/") ? baseUrl : baseUrl + "/";
+    return base + noteHash(path);
+  }
+
+  return { noteHash, notePathFromHash, publicNoteUrl };
 });

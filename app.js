@@ -5,7 +5,7 @@
 
 (async function () {
   const { escapeHtml, renderMarkdown, copyToClipboard, flashCopied, createModal, bindFilterChips, initPaletteSystem } = window.CatalogBehavior;
-  const { noteHash, notePathFromHash } = window.NoteUrl;
+  const { noteHash, notePathFromHash, publicNoteUrl } = window.NoteUrl;
 
   const grid = document.getElementById("grid");
   const filtersEl = document.getElementById("filters");
@@ -232,22 +232,29 @@
   });
 
   const modalOverlay = document.getElementById("modal-overlay");
-  const modalPathEl = document.getElementById("modal-path");
+  const openNoteLinkBtn = document.getElementById("open-note-link-btn");
   const copyNoteLinkBtn = document.getElementById("copy-note-link-btn");
   const maximizeBtn = document.getElementById("modal-maximize-btn");
+
+  // URL pública real del sitio (GitHub Pages) — fija a propósito, NO
+  // derivada de location.*: si la app se abre con file:// (doble
+  // click, ver comentario arriba del todo) location.pathname es una
+  // ruta de filesystem, y si corre embebida en el iframe de un
+  // dashboard es la URL del shell. Ninguna de las dos sirve para
+  // compartir/abrir la nota — siempre tiene que ser esta.
+  const PUBLIC_BASE_URL = "https://luismulato.github.io/anfora/";
 
   const EXPAND_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
   const COMPRESS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
 
-  // Link directo a la nota: hash-routing simple (#nota/<path>), sin
-  // servidor — coherente con que la app entera lee notes-data.js
-  // estático. history.replaceState (no pushState) a propósito: no
-  // queremos ensuciar el historial con una entrada por nota abierta,
-  // solo que la barra de direcciones refleje la nota actual mientras
-  // el modal está abierto (útil para copiar/compartir/recargar).
-  function noteUrl(path) {
-    return `${location.origin}${location.pathname}${noteHash(path)}`;
-  }
+  let currentNote = null;
+
+  // Barra de direcciones: hash-routing simple (#nota/<path>) solo
+  // para reflejar la nota actual en location mientras el modal está
+  // abierto (útil para recargar/back-forward). history.replaceState
+  // (no pushState) a propósito: no ensucia el historial con una
+  // entrada por nota abierta. Sin relación con lo que se copia/abre
+  // (ver PUBLIC_BASE_URL arriba) — esto es solo la barra local.
   function setLocationForNote(path) {
     history.replaceState(null, "", noteHash(path));
   }
@@ -266,8 +273,14 @@
     setMaximized(!modalOverlay.classList.contains("modal-maximized"));
   });
 
+  openNoteLinkBtn.addEventListener("click", () => {
+    if (!currentNote) return;
+    window.open(publicNoteUrl(PUBLIC_BASE_URL, currentNote.path), "_blank", "noopener");
+  });
+
   copyNoteLinkBtn.addEventListener("click", () => {
-    copyToClipboard(modalPathEl.textContent).then(() => flashCopied(copyNoteLinkBtn)).catch(() => {});
+    if (!currentNote) return;
+    copyToClipboard(publicNoteUrl(PUBLIC_BASE_URL, currentNote.path)).then(() => flashCopied(copyNoteLinkBtn)).catch(() => {});
   });
 
   [modalOverlay, document.getElementById("modal-close")].forEach((el) => {
@@ -307,7 +320,7 @@
       bodyHtml: renderNoteBody(note.bodyMd) + embedHtml,
     });
 
-    modalPathEl.textContent = noteUrl(note.path);
+    currentNote = note;
     setMaximized(false);
     if (!opts.skipHashUpdate) setLocationForNote(note.path);
 
