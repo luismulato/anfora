@@ -771,6 +771,10 @@
   }
 
   .modal-box { max-width: 720px; }
+  .modal-header-actions { display: flex; align-items: flex-start; gap: 0.4rem; flex-shrink: 0; }
+  .modal-overlay.modal-maximized { padding: 0; }
+  .modal-overlay.modal-maximized .modal-box { max-width: 100%; width: 100%; height: 100%; max-height: 100%; margin: 0; border-radius: 0; }
+
   .fuente-group { display: inline-flex; align-items: center; gap: 0.3rem; }
   .copy-link-btn {
     display: inline-flex; align-items: center; justify-content: center;
@@ -874,10 +878,23 @@
       <div class="modal-title-group">
         <span class="modal-title" id="modal-title"></span>
         <div class="modal-meta" id="modal-meta"></div>
+        <div class="modal-path-row">
+          <span class="modal-path" id="modal-path"></span>
+          <div class="path-actions">
+            <button type="button" class="path-action-btn" id="copy-note-link-btn" title="Copiar link de esta nota" aria-label="Copiar link de esta nota">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            </button>
+          </div>
+        </div>
       </div>
-      <button class="modal-close" id="modal-close" aria-label="Cerrar" title="Cerrar (Esc)">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
+      <div class="modal-header-actions">
+        <button type="button" class="path-action-btn" id="modal-maximize-btn" title="Maximizar" aria-label="Maximizar nota">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+        </button>
+        <button class="modal-close" id="modal-close" aria-label="Cerrar" title="Cerrar (Esc)">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
     </div>
     <div class="modal-body" id="modal-body"></div>
   </div>
@@ -885,6 +902,7 @@
 
 <script src="notes-data.js"></script>
 <script src="catalog-behavior.js"></script>
+<script src="note-url.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

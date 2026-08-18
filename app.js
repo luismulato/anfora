@@ -5,6 +5,7 @@
 
 (async function () {
   const { escapeHtml, renderMarkdown, copyToClipboard, flashCopied, createModal, bindFilterChips, initPaletteSystem } = window.CatalogBehavior;
+  const { noteHash, notePathFromHash } = window.NoteUrl;
 
   const grid = document.getElementById("grid");
   const filtersEl = document.getElementById("filters");
@@ -230,14 +231,64 @@
     closeId: "modal-close",
   });
 
+  const modalOverlay = document.getElementById("modal-overlay");
+  const modalPathEl = document.getElementById("modal-path");
+  const copyNoteLinkBtn = document.getElementById("copy-note-link-btn");
+  const maximizeBtn = document.getElementById("modal-maximize-btn");
+
+  const EXPAND_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
+  const COMPRESS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';
+
+  // Link directo a la nota: hash-routing simple (#nota/<path>), sin
+  // servidor — coherente con que la app entera lee notes-data.js
+  // estático. history.replaceState (no pushState) a propósito: no
+  // queremos ensuciar el historial con una entrada por nota abierta,
+  // solo que la barra de direcciones refleje la nota actual mientras
+  // el modal está abierto (útil para copiar/compartir/recargar).
+  function noteUrl(path) {
+    return `${location.origin}${location.pathname}${noteHash(path)}`;
+  }
+  function setLocationForNote(path) {
+    history.replaceState(null, "", noteHash(path));
+  }
+  function clearLocationHash() {
+    if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+  }
+
+  function setMaximized(on) {
+    modalOverlay.classList.toggle("modal-maximized", on);
+    maximizeBtn.innerHTML = on ? COMPRESS_ICON : EXPAND_ICON;
+    maximizeBtn.title = on ? "Restaurar tamaño" : "Maximizar";
+    maximizeBtn.setAttribute("aria-label", on ? "Restaurar tamaño de la nota" : "Maximizar nota");
+  }
+
+  maximizeBtn.addEventListener("click", () => {
+    setMaximized(!modalOverlay.classList.contains("modal-maximized"));
+  });
+
+  copyNoteLinkBtn.addEventListener("click", () => {
+    copyToClipboard(modalPathEl.textContent).then(() => flashCopied(copyNoteLinkBtn)).catch(() => {});
+  });
+
+  [modalOverlay, document.getElementById("modal-close")].forEach((el) => {
+    el.addEventListener("click", (e) => {
+      if (el === modalOverlay && e.target !== modalOverlay) return;
+      clearLocationHash();
+    });
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && modal.isOpen()) clearLocationHash();
+  });
+
   function youtubeEmbedUrl(url) {
     if (!url) return null;
     const m = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/shorts\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{6,})/);
     return m ? { embedUrl: `https://www.youtube.com/embed/${m[1]}`, isShort: /\/shorts\//.test(url) } : null;
   }
 
-  function openModal(note) {
+  function openModal(note, opts) {
     if (!note) return;
+    opts = opts || {};
     const metaParts = [];
     if (note.tipo) metaParts.push(`<span class="badge">${escapeHtml(note.tipo)}</span>`);
     if (note.fechaArchivado) metaParts.push(escapeHtml(note.fechaArchivado));
@@ -255,6 +306,10 @@
       metaHtml: metaParts.join(" · "),
       bodyHtml: renderNoteBody(note.bodyMd) + embedHtml,
     });
+
+    modalPathEl.textContent = noteUrl(note.path);
+    setMaximized(false);
+    if (!opts.skipHashUpdate) setLocationForNote(note.path);
 
     document.querySelectorAll("#modal-meta .copy-link-btn").forEach((btn) => {
       btn.addEventListener("click", () => {
@@ -293,6 +348,15 @@
     buildFilters();
     render();
     buildInfluencers();
+
+    // Deep link: si se llegó con #nota/<path> (link copiado o
+    // compartido), abrir esa nota directo — sin volver a tocar el
+    // hash, ya está puesto.
+    const deepLinkPath = notePathFromHash(location.hash);
+    if (deepLinkPath) {
+      const deepLinkNote = notes.find((n) => n.path === deepLinkPath);
+      if (deepLinkNote) openModal(deepLinkNote, { skipHashUpdate: true });
+    }
   } catch (err) {
     grid.innerHTML = `<div class="error-state">No se pudieron cargar las notas: ${escapeHtml(err.message)}</div>`;
   }
