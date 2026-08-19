@@ -48,6 +48,9 @@ Muestra un desglose visual de qué está ocupando tu ventana de contexto (útil 
 `/mcp`
 Lista los servidores MCP conectados y su estado (útil para depurar integraciones externas).
 
+`claude auth status`
+Comando de terminal (no dentro de una sesión) que muestra el estado de autenticación: si estás logueado, método de auth (`claude.ai` vs API key), proveedor de API, email/org de la cuenta y tipo de suscripción — en JSON. Útil para diagnosticar problemas de login o confirmar bajo qué cuenta corre una sesión.
+
 `/clear`
 Borra por completo el historial de la conversación. Úsalo al cambiar de tarea, cuando la anterior ya no aporta nada.
 
