@@ -1,11 +1,30 @@
 // Ánfora — catálogo que lee las notas desde notes-data.js
-// (window.ANFORA_NOTES, generado por refresh-anfora-local.sh /
-// publicar-anfora-on-github.sh). Sin fetch() a propósito, para poder
-// abrirse con doble-click (file://) sin necesitar servidor.
+// (window.ANFORA_NOTES, generado por el script de sync de cada
+// instancia — ver ~/Lab/toolkit/anfora-ui/README.md). Sin fetch() a
+// propósito, para poder abrirse con doble-click (file://) sin
+// necesitar servidor. Config por instancia: window.ANFORA_CONFIG
+// (opcional, declarado antes de este script).
 
 (async function () {
   const { escapeHtml, renderMarkdown, copyToClipboard, flashCopied, createModal, bindFilterChips, initPaletteSystem } = window.CatalogBehavior;
   const { noteHash, notePathFromHash, publicNoteUrl } = window.NoteUrl;
+
+  // Config por instancia (ver ~/Lab/toolkit/anfora-ui/README.md):
+  // window.ANFORA_CONFIG es opcional, cada instancia lo declara antes
+  // de este script (o no lo declara, y queda esta instancia — Lab —
+  // como default). publicBaseUrl vacío/null desactiva Abrir/Copiar
+  // link (instancia sin sitio público, ej. embebida en un dashboard).
+  const ANFORA_CONFIG = Object.assign({
+    publicBaseUrl: "https://luismulato.github.io/anfora/",
+    storageKeyPrefix: "anfora",
+    title: "Ánfora",
+    heading: "Ánfora",
+    lead: "Notas archivadas sobre IA y pensamiento sistémico.",
+  }, window.ANFORA_CONFIG || {});
+
+  document.title = ANFORA_CONFIG.title;
+  document.getElementById("anfora-heading").textContent = ANFORA_CONFIG.heading;
+  document.getElementById("anfora-lead").textContent = ANFORA_CONFIG.lead;
 
   const grid = document.getElementById("grid");
   const filtersEl = document.getElementById("filters");
@@ -29,8 +48,8 @@
      de las 3 paletas (estandar/cyberpunk/solarpunk) son propios de
      Ánfora, definidos en el <style> — initPaletteSystem no los conoce. --- */
   initPaletteSystem({
-    paletteStorageKey: "anfora-palette",
-    themeStorageKey: "anfora-theme",
+    paletteStorageKey: `${ANFORA_CONFIG.storageKeyPrefix}-palette`,
+    themeStorageKey: `${ANFORA_CONFIG.storageKeyPrefix}-theme`,
     defaultPalette: "estandar",
   });
 
@@ -241,8 +260,14 @@
   // click, ver comentario arriba del todo) location.pathname es una
   // ruta de filesystem, y si corre embebida en el iframe de un
   // dashboard es la URL del shell. Ninguna de las dos sirve para
-  // compartir/abrir la nota — siempre tiene que ser esta.
-  const PUBLIC_BASE_URL = "https://luismulato.github.io/anfora/";
+  // compartir/abrir la nota — siempre tiene que ser esta. Viene de
+  // ANFORA_CONFIG (ver arriba); si la instancia no tiene sitio
+  // público, queda vacía y se ocultan los botones de abrir/copiar.
+  const PUBLIC_BASE_URL = ANFORA_CONFIG.publicBaseUrl || "";
+  if (!PUBLIC_BASE_URL) {
+    openNoteLinkBtn.hidden = true;
+    copyNoteLinkBtn.hidden = true;
+  }
 
   const EXPAND_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>';
   const COMPRESS_ICON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v3a2 2 0 0 1-2 2H3"/><path d="M21 8h-3a2 2 0 0 1-2-2V3"/><path d="M3 16h3a2 2 0 0 1 2 2v3"/><path d="M16 21v-3a2 2 0 0 1 2-2h3"/></svg>';

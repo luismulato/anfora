@@ -1,16 +1,19 @@
 <!--
   Template: catalog-ui v1.2.0 (vendored, incluye palette-system.css
   opcional) + catalog-behavior v1.3.0 (vendored, incluye
-  initPaletteSystem opcional)
-  Fuente y docs: ~/Lab/toolkit/catalog-ui/ y ~/Lab/toolkit/catalog-behavior/
-  (README.md, CHANGELOG.md en cada uno)
+  initPaletteSystem opcional) + anfora-ui v1.0.0 (vendored: este
+  index.html + app.js + note-url.js)
+  Fuente y docs: ~/Lab/toolkit/catalog-ui/, ~/Lab/toolkit/catalog-behavior/
+  y ~/Lab/toolkit/anfora-ui/ (README.md, CHANGELOG.md en cada uno)
   Para actualizar: comparar los bloques "catalog-ui vendored" del
   <style> de abajo, y app.js, contra la versión más nueva de cada
   toolkit y, si conviene, volver a copiar + subir el número acá
   arriba. Las extensiones propias (valores de color de las 3 paletas
   estándar/cyberpunk/solarpunk, tabs, canales, badges de tipo/dominio,
-  embeds) van en sus bloques propios aparte, no se tocan al
-  upgradear.
+  embeds) van en sus bloques propios aparte, no se tocan al upgradear.
+  title/h1/lead los pisa app.js desde window.ANFORA_CONFIG — esta
+  instancia (Lab) no lo declara y usa los defaults de app.js, que son
+  el texto que se ve acá abajo tal cual.
 -->
 <!doctype html>
 <html lang="es">
@@ -827,8 +830,9 @@
   </div>
 </div>
 <main>
-  <h1>Ánfora</h1>
-  <p class="lead">Notas archivadas sobre IA y pensamiento sistémico. Esta página lee los archivos <code>.md</code> del repo en vivo — no hay contenido duplicado ni pre-generado.</p>
+  <!-- Texto seteado por app.js desde ANFORA_CONFIG.heading/lead — lo que queda acá es solo fallback antes de que corra el script. -->
+  <h1 id="anfora-heading">Ánfora</h1>
+  <p class="lead" id="anfora-lead">Notas archivadas sobre IA y pensamiento sistémico.</p>
 
   <div class="view-tabs" id="view-tabs">
     <button type="button" class="view-tab active" data-view="notas">Notas</button>
