@@ -14,6 +14,9 @@
   // de este script (o no lo declara, y queda esta instancia — Lab —
   // como default). publicBaseUrl vacío/null desactiva Abrir/Copiar
   // link (instancia sin sitio público, ej. embebida en un dashboard).
+  // domain (opcional): si la instancia lo declara, title/heading pasan
+  // a ser "Ánfora::<domain>" — así se distingue de un vistazo en qué
+  // instancia se está parado, sin que cada una hardcodee el string.
   const ANFORA_CONFIG = Object.assign({
     publicBaseUrl: "https://luismulato.github.io/anfora/",
     storageKeyPrefix: "anfora",
@@ -22,8 +25,9 @@
     lead: "Notas archivadas sobre IA y pensamiento sistémico.",
   }, window.ANFORA_CONFIG || {});
 
-  document.title = ANFORA_CONFIG.title;
-  document.getElementById("anfora-heading").textContent = ANFORA_CONFIG.heading;
+  const domainLabel = ANFORA_CONFIG.domain ? `Ánfora::${ANFORA_CONFIG.domain}` : null;
+  document.title = domainLabel || ANFORA_CONFIG.title;
+  document.getElementById("anfora-heading").textContent = domainLabel || ANFORA_CONFIG.heading;
   document.getElementById("anfora-lead").textContent = ANFORA_CONFIG.lead;
 
   const grid = document.getElementById("grid");

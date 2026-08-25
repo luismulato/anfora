@@ -1,19 +1,24 @@
 <!--
-  Template: catalog-ui v1.2.0 (vendored, incluye palette-system.css
-  opcional) + catalog-behavior v1.3.0 (vendored, incluye
-  initPaletteSystem opcional) + anfora-ui v1.0.0 (vendored: este
-  index.html + app.js + note-url.js)
-  Fuente y docs: ~/Lab/toolkit/catalog-ui/, ~/Lab/toolkit/catalog-behavior/
-  y ~/Lab/toolkit/anfora-ui/ (README.md, CHANGELOG.md en cada uno)
-  Para actualizar: comparar los bloques "catalog-ui vendored" del
-  <style> de abajo, y app.js, contra la versión más nueva de cada
-  toolkit y, si conviene, volver a copiar + subir el número acá
-  arriba. Las extensiones propias (valores de color de las 3 paletas
-  estándar/cyberpunk/solarpunk, tabs, canales, badges de tipo/dominio,
-  embeds) van en sus bloques propios aparte, no se tocan al upgradear.
-  title/h1/lead los pisa app.js desde window.ANFORA_CONFIG — esta
-  instancia (Lab) no lo declara y usa los defaults de app.js, que son
-  el texto que se ve acá abajo tal cual.
+  anfora-ui v1.2.0 — este directorio (versions/1.2.0/) ES el
+  template fuente, no una copia vendoreada. Cada instancia (Lab
+  público, lm-personal embebida en dashboard, futuros dominios)
+  vendorea esta versión copiando index.html + app.js + note-url.js
+  TAL CUAL — nunca editar title/h1/lead acá adentro, se pisan desde
+  window.ANFORA_CONFIG (title/heading/lead/publicBaseUrl/
+  storageKeyPrefix/domain) en un <script> propio antes de app.js, ver
+  README.md. Sin ese script, app.js usa sus defaults (el
+  comportamiento de la instancia Lab, que fue la primera y no lo
+  declara). Incluye vendoreados adentro: catalog-ui v1.2.0 (bloque
+  "catalog-ui vendored" del <style>) + catalog-behavior v1.3.0.
+
+  notes-data.local.js (opcional, cargado después de notes-data.js):
+  override local-only de window.ANFORA_NOTES con el set completo de
+  notas (incluye las marcadas privadas). Cada instancia lo genera a
+  demanda en su propio script de refresh, gitignoreado — nunca se
+  publica. Si el archivo no existe (caso del sitio público en GitHub
+  Pages), el <script> simplemente falla en cargar (404 silencioso) y
+  queda el ANFORA_NOTES público de notes-data.js sin overridear. Ver
+  README.md, sección "Notas privadas".
 -->
 <!doctype html>
 <html lang="es">
@@ -907,6 +912,7 @@
 </div>
 
 <script src="notes-data.js"></script>
+<script src="notes-data.local.js"></script>
 <script src="catalog-behavior.js"></script>
 <script src="note-url.js"></script>
 <script src="app.js"></script>
