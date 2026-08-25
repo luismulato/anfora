@@ -4,6 +4,7 @@
 
 **Fuente:** https://www.storytelling.cool/antropo.html
 **Fecha archivado:** 2026-08-11
+**Visibilidad:** public
 **Tipo:** Artículo
 
 ## Resumen

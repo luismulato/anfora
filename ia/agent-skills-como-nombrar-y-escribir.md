@@ -2,6 +2,7 @@
 
 **Fuente:** síntesis propia a partir de la guía oficial de Anthropic para Agent Skills + convenciones generales de naming de CLI/software (no es copia textual del doc oficial — para el original, ver la documentación de Claude Code / Agent Skills de Anthropic).
 **Fecha archivado:** 2026-08-11
+**Visibilidad:** public
 **Tipo:** Guía
 
 ## Qué es

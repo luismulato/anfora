@@ -2,6 +2,7 @@
 
 **Fuente:** Prompt de autoría propia (sin recurso externo asociado)
 **Fecha archivado:** 2026-08-23
+**Visibilidad:** public
 **Tipo:** Prompt / Plantilla de prompt
 
 ## Resumen

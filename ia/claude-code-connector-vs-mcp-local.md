@@ -4,6 +4,7 @@
 
 **Fuente:** https://code.claude.com/docs/en/mcp
 **Fecha archivado:** 2026-08-18
+**Visibilidad:** public
 **Tipo:** Docs
 
 ## Resumen

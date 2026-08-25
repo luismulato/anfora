@@ -4,6 +4,7 @@
 
 **Fuente:** https://code.claude.com/docs/en/permission-modes
 **Fecha archivado:** 2026-08-11
+**Visibilidad:** public
 **Tipo:** Docs
 
 ## Resumen

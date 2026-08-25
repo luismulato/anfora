@@ -4,6 +4,7 @@
 
 **Fuente:** https://youtube.com/shorts/YutiuvWJwDE?si=hXyR5BsvQsLueqC7
 **Fecha archivado:** 2026-08-14
+**Visibilidad:** public
 **Tipo:** Video de YouTube (Short)
 **Canal:** [David AiPro](https://www.youtube.com/@David_AIPro) — 2.05 mil suscriptores (automatización de procesos con IA y marketing digital para emprendedores)
 

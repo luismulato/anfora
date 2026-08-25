@@ -1,6 +1,6 @@
 // Ánfora — catálogo que lee las notas desde notes-data.js
 // (window.ANFORA_NOTES, generado por el script de sync de cada
-// instancia — ver ~/Lab/toolkit/anfora-ui/README.md). Sin fetch() a
+// instancia — ver ~/Lab/toolkit/anfora/packages/anfora-web/README.md). Sin fetch() a
 // propósito, para poder abrirse con doble-click (file://) sin
 // necesitar servidor. Config por instancia: window.ANFORA_CONFIG
 // (opcional, declarado antes de este script).
@@ -8,8 +8,9 @@
 (async function () {
   const { escapeHtml, renderMarkdown, copyToClipboard, flashCopied, createModal, bindFilterChips, initPaletteSystem } = window.CatalogBehavior;
   const { noteHash, notePathFromHash, publicNoteUrl } = window.NoteUrl;
+  const { normalizeVisibilidad, isListable } = window.Visibility;
 
-  // Config por instancia (ver ~/Lab/toolkit/anfora-ui/README.md):
+  // Config por instancia (ver ~/Lab/toolkit/anfora/packages/anfora-web/README.md):
   // window.ANFORA_CONFIG es opcional, cada instancia lo declara antes
   // de este script (o no lo declara, y queda esta instancia — Lab —
   // como default). publicBaseUrl vacío/null desactiva Abrir/Copiar
@@ -42,6 +43,11 @@
   const SORT_DEFAULT_DIR = { title: 1, date: -1, domain: 1, tipo: 1 };
 
   let notes = [];
+  // Subset de `notes` que puede aparecer en grid/filtros/búsqueda/
+  // Influencers — excluye "unlisted" (sigue en `notes` para el
+  // deep-link por hash, que sí tiene que poder abrirla). Ver
+  // visibility.js.
+  let listedNotes = [];
   let activeDomain = "all";
   let domainAccentMap = {}; // dominio -> índice de acento (0-2), por posición ordenada
   let sortBy = "date";
@@ -90,6 +96,7 @@
     let canalNombre = null;
     let canalUrl = null;
     let canalInfo = null;
+    let visibilidadRaw = null;
     let bodyStartIdx = 0;
 
     for (let i = 0; i < lines.length; i++) {
@@ -109,9 +116,13 @@
       if (ti) { tipo = ti[1].trim(); continue; }
       const ca = line.match(/^\*\*Canal:\*\*\s*\[([^\]]+)\]\(([^)]+)\)(?:\s*—\s*(.*))?$/);
       if (ca) { canalNombre = ca[1].trim(); canalUrl = ca[2].trim(); canalInfo = (ca[3] || "").trim(); continue; }
-      const isMetaLine = h1 || img || fu || fe || ti || ca || line.trim() === "";
+      const vi = line.match(/^\*\*Visibilidad:\*\*\s*(.*)$/);
+      if (vi) { visibilidadRaw = vi[1].trim(); continue; }
+      const isMetaLine = h1 || img || fu || fe || ti || ca || vi || line.trim() === "";
       if (!isMetaLine) { bodyStartIdx = i; break; }
     }
+
+    const visibilidad = normalizeVisibilidad(visibilidadRaw);
 
     const bodyLines = lines.slice(bodyStartIdx);
     const bodyMd = bodyLines.join("\n");
@@ -130,7 +141,7 @@
 
     const domain = path.split("/")[0];
 
-    return { path, title, portada, fuente, fechaArchivado, tipo, canalNombre, canalUrl, canalInfo, domain, excerpt, bodyMd };
+    return { path, title, portada, fuente, fechaArchivado, tipo, canalNombre, canalUrl, canalInfo, visibilidad, domain, excerpt, bodyMd };
   }
 
   function loadNotes() {
@@ -139,7 +150,7 @@
   }
 
   function buildFilters() {
-    const domains = [...new Set(notes.map((n) => n.domain))].sort();
+    const domains = [...new Set(listedNotes.map((n) => n.domain))].sort();
     // Índice por posición ordenada, no por hash — con hash, dos
     // dominios pueden caer en el mismo accent-N por pura coincidencia
     // (ej. "neurociencia" y "systems-thinking" mod 3). Por posición,
@@ -158,7 +169,7 @@
   /* --- Tab Influencers: agrupa notas por canal de YouTube (**Canal:** en la nota) --- */
   function buildInfluencers() {
     const byChannel = new Map();
-    for (const n of notes) {
+    for (const n of listedNotes) {
       if (!n.canalUrl) continue;
       const prev = byChannel.get(n.canalUrl);
       if (!prev || (n.fechaArchivado || "") >= (prev.fechaArchivado || "")) {
@@ -231,10 +242,10 @@
 
   function render() {
     const q = searchInput.value.trim();
-    const filtered = notes.filter((n) => (activeDomain === "all" || n.domain === activeDomain) && matchesSearch(n, q));
+    const filtered = listedNotes.filter((n) => (activeDomain === "all" || n.domain === activeDomain) && matchesSearch(n, q));
     const sorted = sortNotes(filtered);
 
-    resultCount.textContent = `${sorted.length} de ${notes.length} notas`;
+    resultCount.textContent = `${sorted.length} de ${listedNotes.length} notas`;
     grid.innerHTML = sorted.length
       ? sorted.map(noteCard).join("")
       : `<div class="empty-state">No hay notas que coincidan.</div>`;
@@ -386,6 +397,7 @@
 
   try {
     notes = await loadNotes();
+    listedNotes = notes.filter((n) => isListable(n.visibilidad));
     updateSortDirBtn();
     buildFilters();
     render();

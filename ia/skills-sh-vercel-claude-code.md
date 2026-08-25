@@ -4,6 +4,7 @@
 
 **Fuente:** https://youtube.com/shorts/pi8MQoETmN8?si=gli6TX-MywAFEQb6
 **Fecha archivado:** 2026-08-13
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 
 ## Resumen

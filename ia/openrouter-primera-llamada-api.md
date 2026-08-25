@@ -4,6 +4,7 @@
 
 **Fuente:** https://openrouter.ai/docs
 **Fecha archivado:** 2026-08-11
+**Visibilidad:** public
 **Tipo:** Docs
 
 ## Resumen

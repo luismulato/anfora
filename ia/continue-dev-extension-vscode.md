@@ -4,6 +4,7 @@
 
 **Fuente:** https://docs.continue.dev
 **Fecha archivado:** 2026-08-13
+**Visibilidad:** public
 **Tipo:** Docs
 
 ## Resumen

@@ -4,6 +4,7 @@
 
 **Fuente:** https://youtube.com/shorts/mRhS2t6sXtk
 **Fecha archivado:** 2026-08-17
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 **Canal:** [Nestor](https://www.youtube.com/@Nestorpuri) — 3.45 K suscriptores (recomendaciones de plataformas digitales, tips y tutoriales)
 

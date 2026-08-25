@@ -2,6 +2,7 @@
 
 **Fuente:** Corporate Rebels
 **Fecha archivado:** 2026-08-09
+**Visibilidad:** public
 **Tipo:** PDF
 
 ## Resumen

@@ -4,6 +4,7 @@
 
 **Fuente:** [Documentación oficial de Claude Code](https://docs.anthropic.com/en/docs/claude-code/overview)
 **Fecha archivado:** 2026-08-14
+**Visibilidad:** public
 **Tipo:** Guía / Documentation
 
 ## Resumen

@@ -2,6 +2,7 @@
 
 **Fuente:** https://youtu.be/E0dUDopLcus?si=2_V1s43Cvgdft8va
 **Fecha archivado:** 2026-08-20
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 
 ## Resumen

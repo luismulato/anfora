@@ -2,6 +2,7 @@
 
  **Fuente:** https://code.claude.com/docs/en/costs.md
  **Fecha archivado:** 2026-08-14
+ **Visibilidad:** public
  **Tipo:** Guía / Documentation
 
  Basada en tus métricas de uso reciente:

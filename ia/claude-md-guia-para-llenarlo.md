@@ -2,6 +2,7 @@
 
 **Fuente:** síntesis propia a partir de la documentación oficial de Claude Code (Anthropic) y práctica propia armando CLAUDE.md globales y de proyecto.
 **Fecha archivado:** 2026-08-12
+**Visibilidad:** public
 **Tipo:** Guía
 
 ## Resumen

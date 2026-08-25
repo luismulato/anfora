@@ -1,10 +1,11 @@
 <!--
-  anfora-ui v1.2.0 — este directorio (versions/1.2.0/) ES el
-  template fuente, no una copia vendoreada. Cada instancia (Lab
-  público, lm-personal embebida en dashboard, futuros dominios)
-  vendorea esta versión copiando index.html + app.js + note-url.js
-  TAL CUAL — nunca editar title/h1/lead acá adentro, se pisan desde
-  window.ANFORA_CONFIG (title/heading/lead/publicBaseUrl/
+  anfora-web v1.3.0 — este directorio (toolkit/anfora/packages/anfora-web/) ES
+  la fuente única del motor (sin carpetas versions/X.Y.Z/, ver
+  CHANGELOG.md para el historial). Cada instancia (Lab público,
+  lm-personal embebida en dashboard, futuros dominios) vendorea el
+  HEAD actual copiando index.html + app.js + note-url.js +
+  visibility.js TAL CUAL — nunca editar title/h1/lead acá adentro, se
+  pisan desde window.ANFORA_CONFIG (title/heading/lead/publicBaseUrl/
   storageKeyPrefix/domain) en un <script> propio antes de app.js, ver
   README.md. Sin ese script, app.js usa sus defaults (el
   comportamiento de la instancia Lab, que fue la primera y no lo
@@ -18,7 +19,7 @@
   publica. Si el archivo no existe (caso del sitio público en GitHub
   Pages), el <script> simplemente falla en cargar (404 silencioso) y
   queda el ANFORA_NOTES público de notes-data.js sin overridear. Ver
-  README.md, sección "Notas privadas".
+  README.md, sección "Visibilidad de notas".
 -->
 <!doctype html>
 <html lang="es">
@@ -915,6 +916,7 @@
 <script src="notes-data.local.js"></script>
 <script src="catalog-behavior.js"></script>
 <script src="note-url.js"></script>
+<script src="visibility.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

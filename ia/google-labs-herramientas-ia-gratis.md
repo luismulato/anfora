@@ -4,6 +4,7 @@
 
 **Fuente:** https://youtube.com/shorts/nZJ4-8LBqco
 **Fecha archivado:** 2026-08-14
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 **Canal:** [Migue Baena IA](https://www.youtube.com/@MigueBaenaIA) — 258 mil suscriptores
 

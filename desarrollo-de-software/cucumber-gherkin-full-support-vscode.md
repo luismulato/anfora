@@ -2,6 +2,7 @@
 
 **Fuente:** https://marketplace.visualstudio.com/items?itemName=alexkrechik.cucumberautocomplete
 **Fecha archivado:** 2026-08-21
+**Visibilidad:** public
 **Tipo:** Guía Técnica / Artículo
 
 ## Resumen

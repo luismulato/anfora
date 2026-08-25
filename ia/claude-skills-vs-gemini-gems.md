@@ -1,6 +1,7 @@
 # Claude Skills vs. Gemini Gems
 
 **Fecha archivado:** 2026-08-18
+**Visibilidad:** public
 **Tipo:** Información general (sin fuente externa — explicación generada en conversación)
 
 ## Resumen

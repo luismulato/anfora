@@ -2,6 +2,7 @@
 
 **Fuente:** Documentación y notas técnicas de integración Behat/WordPress
 **Fecha archivado:** 2026-08-21
+**Visibilidad:** public
 **Tipo:** Guía Técnica / Artículo
 
 ## Resumen

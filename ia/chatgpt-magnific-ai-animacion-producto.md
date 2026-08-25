@@ -2,6 +2,7 @@
 
 **Fuente:** https://youtube.com/shorts/5hG3JSnUK4Y
 **Fecha archivado:** 2026-08-20
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 **Canal:** [maxmaxdata](https://www.youtube.com/@maxmaxdata) — 464 mil suscriptores (IA y Big Data)
 

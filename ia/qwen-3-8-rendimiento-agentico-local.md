@@ -4,6 +4,7 @@
 
 **Fuente:** https://youtu.be/ZqkljdI1HT0?si=QLbh38nswfTVoJUc
 **Fecha archivado:** 2026-08-23
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 **Canal:** [Xavier Mitjana](https://www.youtube.com/@XavierMitjana) — 374 k suscriptores (tutoriales sobre herramientas de inteligencia artificial para creación de contenido)
 

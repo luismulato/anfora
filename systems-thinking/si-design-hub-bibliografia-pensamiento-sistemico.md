@@ -4,6 +4,7 @@
 
 **Fuente:** https://www.linkedin.com/posts/si-design-network_dive-into-this-handpicked-selection-and-discover-activity-7493943349184258048-GwJd
 **Fecha archivado:** 2026-08-24
+**Visibilidad:** public
 **Tipo:** Artículo / Publicación
 
 ## Resumen

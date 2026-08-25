@@ -4,6 +4,7 @@
 
 **Fuente:** https://youtu.be/yBy6vXx0wtU?si=jQJ0dWjOBeA3_UzR
 **Fecha archivado:** 2026-08-14
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 **Canal:** [AprendemosJuntos](https://www.youtube.com/@AprendemosJuntos) — 5.2 M de suscriptores (charlas y entrevistas sobre vida, sostenibilidad y los grandes retos del futuro, impulsado por BBVA)
 

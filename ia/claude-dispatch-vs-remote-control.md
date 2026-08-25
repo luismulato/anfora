@@ -4,6 +4,7 @@
 
 **Fuente:** https://claude.com/blog/dispatch-and-computer-use
 **Fecha archivado:** 2026-08-18
+**Visibilidad:** public
 **Tipo:** Artículo / Anuncio oficial + comparación de funciones
 
 ## Resumen

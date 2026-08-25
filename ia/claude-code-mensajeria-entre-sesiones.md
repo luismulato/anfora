@@ -4,6 +4,7 @@
 
 **Fuente:** https://code.claude.com/docs/en/cross-session-messaging
 **Fecha archivado:** 2026-08-17
+**Visibilidad:** public
 **Tipo:** Docs
 
 ## Resumen

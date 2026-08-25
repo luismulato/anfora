@@ -2,6 +2,7 @@
 
 **Fuente:** https://youtube.com/shorts/Pnk0bBB5kbY
 **Fecha archivado:** 2026-08-16
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 **Canal:** [David AiPro](https://www.youtube.com/@David_AIPro) — 2.05 mil suscriptores
 

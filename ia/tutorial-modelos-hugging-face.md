@@ -4,6 +4,7 @@
 
 **Fuente:** https://youtu.be/Puk-AJcnwbA
 **Fecha archivado:** 2026-08-15
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 **Canal:** [Liorant - IA para empresas](https://www.youtube.com/@liorant-tech) — 242 suscriptores
 

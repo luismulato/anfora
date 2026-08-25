@@ -4,6 +4,7 @@
 
 **Fuente:** Nota técnica / Registro de uso
 **Fecha archivado:** 2026-08-18
+**Visibilidad:** public
 **Tipo:** Nota técnica / Comparativa de herramientas
 
 ## Resumen

@@ -2,6 +2,7 @@
 
 **Fuente:** https://www.youtube.com/watch?v=vEq5eGE8lak
 **Fecha archivado:** 2026-08-16
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 **Canal:** [HolaMundo](https://www.youtube.com/@HolaMundoDev) — 976 mil suscriptores
 

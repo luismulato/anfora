@@ -2,6 +2,7 @@
 
 **Fuente:** https://youtu.be/2myd3cgqe2k
 **Fecha archivado:** 2026-08-19
+**Visibilidad:** public
 **Tipo:** Video de YouTube
 **Canal:** [BettaTech](https://www.youtube.com/@BettaTech) — 292 k suscriptores (contenido sobre profesionalización del desarrollo de software)
 
