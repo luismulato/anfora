@@ -44,6 +44,7 @@ bullet actual y deja los hijos donde estaban. Por eso el plugin.
 | Click en el gutter del bullet | Plegar/desplegar ese sub-árbol con el mouse. |
 | `Cmd+A` (repetido) | Selección progresiva: primero el bullet, después el sub-árbol, después toda la nota. Comportamiento de Outliner. |
 | `Cmd+L` (macOS) | Convertir la línea o el bullet bajo el cursor en un to-do (`- [ ] …`). Alterna entre ítem normal y checklist. |
+| `Cmd+Shift+U` | Comando nativo `editor:toggle-bullet-list`: convierte la línea actual (o la selección) en bullet, o se lo quita si ya lo es. Sin tecla asignada por defecto. |
 
 ## Referencias
 
