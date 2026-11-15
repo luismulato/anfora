@@ -64,19 +64,19 @@ Página con todo para usar la metodología (copias locales de las skills, instal
 - Cloudflare Security Audit: https://github.com/cloudflare/security-audit-skill
 - Image to Code: sin repo identificado todavía.
 
-**Notas en Ánfora** (se abren en la app Ánfora de la tailnet):
-- [5 herramientas y skills de diseño para Claude Code](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Fcinco-herramientas-y-skills-de-diseno-para-claude-code.md)
-- [Agent Skills esenciales para Claude](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Fagent-skills-esenciales-para-claude.md)
-- [Astryx, sistema de diseño de Meta](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Fastryx-sistema-diseno-meta-react.md)
-- [GSAP y ScrollTrigger](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Fgsap-scrolltrigger-animaciones-3d.md)
-- [HyperFrames](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Fhyperframes-motor-programatico-de-video-basado-en-html-para.md)
-- [Skillry: animaciones y video con Claude](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Frepositorio-skillry-de-generacion-de-animaciones-y-video-con.md)
-- [Cloudflare Security Audit](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Fcloudflare-security-audit-skill.md)
-- [Cloudflare Security Audit (2)](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Fcloudflare-security-audit-skill-2.md)
-- [Find Skills](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Ffind-skills-para-claude.md)
-- [Find Skills de Vercel Labs](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Ffind-skills-vercel-labs-gestor-habilidades.md)
-- [Selección de skills para Claude Code](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Fseleccion-de-skills-para-claude-code-planificacion.md)
-- [Buenas prácticas para crear skills](https://bucky.taild11f63.ts.net/luis.jobs/apps/anfora-web/#nota/ia%2Fbuenas-practicas-para-la-creacion-de-skills-en-agentes-de-ia.md)
+**Notas en Ánfora** (se abren dentro de Ánfora, en el sitio público y en la tailnet):
+- [5 herramientas y skills de diseño para Claude Code](#nota/ia%2Fcinco-herramientas-y-skills-de-diseno-para-claude-code.md)
+- [Agent Skills esenciales para Claude](#nota/ia%2Fagent-skills-esenciales-para-claude.md)
+- [Astryx, sistema de diseño de Meta](#nota/ia%2Fastryx-sistema-diseno-meta-react.md)
+- [GSAP y ScrollTrigger](#nota/ia%2Fgsap-scrolltrigger-animaciones-3d.md)
+- [HyperFrames](#nota/ia%2Fhyperframes-motor-programatico-de-video-basado-en-html-para.md)
+- [Skillry: animaciones y video con Claude](#nota/ia%2Frepositorio-skillry-de-generacion-de-animaciones-y-video-con.md)
+- [Cloudflare Security Audit](#nota/ia%2Fcloudflare-security-audit-skill.md)
+- [Cloudflare Security Audit (2)](#nota/ia%2Fcloudflare-security-audit-skill-2.md)
+- [Find Skills](#nota/ia%2Ffind-skills-para-claude.md)
+- [Find Skills de Vercel Labs](#nota/ia%2Ffind-skills-vercel-labs-gestor-habilidades.md)
+- [Selección de skills para Claude Code](#nota/ia%2Fseleccion-de-skills-para-claude-code-planificacion.md)
+- [Buenas prácticas para crear skills](#nota/ia%2Fbuenas-practicas-para-la-creacion-de-skills-en-agentes-de-ia.md)
 
 ## Pendientes
 
