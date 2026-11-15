@@ -61,11 +61,15 @@ Resume la conversación preservando lo importante, liberando espacio sin perder 
 `/compact <foco>`
 Igual que `/compact`, pero le decís qué priorizar al resumir. Ej: `/compact conservá el esquema de la base de datos y las decisiones de arquitectura, descartá los intentos fallidos`
 
+`/rewind` (o `Esc` dos veces)
+Deshace lo último: te lista tus mensajes anteriores y volvés a uno, sacando del contexto todo lo posterior (comandos, salidas, respuestas). Podés restaurar solo la conversación, solo el código o ambos. No revierte efectos de comandos de Bash (`rm`, `git commit`), solo las ediciones de archivos hechas por Claude.
+
 ## 3. Cuándo usar cada cosa
 
 - **`/clear`** → terminaste una tarea y empezás otra sin relación. Evita que contexto viejo "contamine" lo nuevo.
 - **`/compact`** → seguís en la misma tarea pero la conversación ya pesa mucho. Mantiene continuidad, pero es más lento y algo más lossy que `/clear`.
 - **`/context`** → antes de decidir entre `/clear` o `/compact`, mirá esto para saber qué te está comiendo el contexto (herramientas, archivos, historial).
+- **`/rewind`** → el último comando o respuesta no sirvió y no querés que quede en el contexto: volvés al mensaje anterior sin gastar un `/clear` ni un `/compact`.
 - **`/model`** → bajá o subí de modelo según la complejidad real de lo que sigue, no por costumbre.
 - **`/mcp`** → si algo falla al usar una herramienta externa, primero revisá acá si el servidor está conectado.
 
