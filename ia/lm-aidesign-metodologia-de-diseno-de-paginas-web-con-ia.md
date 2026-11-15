@@ -23,7 +23,7 @@ Marca: ✅ instalada · ⬇️ falta instalar · ⭕ fase o herramienta opcional
 | **2. Dirección** | Generar 2 o 3 variantes distintas de la página. | **`design-taste-frontend`** ✅ | Frontend Design de Anthropic ⬇️ · `nuevo-prototipo` ✅ · Image to Code ⬇️ |
 | **3. Elección** | Elegir una variante a mano, en celular y compu. | Humano | — |
 | **4. Pulido** | Jerarquía, tipografía, responsive, accesibilidad, copy. | **`impeccable`** ✅ | `redesign-existing-projects` ✅ · Web Design Guidelines de Vercel ⬇️ |
-| **5. Verificación** | Revisar a 390 y 1280 px, claro y oscuro, consola y Lighthouse. Obligatoria: cierra el ciclo. | Chrome DevTools y claude-in-chrome ✅ | Playwright MCP ⬇️ |
+| **5. Verificación** | Revisar a 390 y 1280 px, claro y oscuro, consola y Lighthouse. Obligatoria: cierra el ciclo. | Chrome DevTools y claude-in-chrome ✅ | Playwright MCP ✅ |
 | **6. Publicar** | Pasar a producción, desplegar, conectar dominio. | Scripts de deploy del proyecto | Cloudflare Security Audit Skill (revisar antes de prod) |
 
 ## Fases opcionales ⭕
@@ -41,7 +41,7 @@ Marca: ✅ instalada · ⬇️ falta instalar · ⭕ fase o herramienta opcional
 - Una fase = una tarjeta del kanban del proyecto; termina en Verify y la aprueba el humano (ver AIDev).
 - Las variantes de la fase 2 son distintas entre sí (otra dirección, no otro color). Si se parecen, se descartan.
 - Antes de tocar la página en producción, guardar una copia versionada.
-- Prioridad de instalación: primero Frontend Design (Anthropic), Web Design Guidelines (Vercel) y Playwright MCP, que refuerzan las fases 2, 4 y 5. Después las de apoyo según necesidad. Las ⭕ B, C y D solo si la hipótesis lo pide.
+- Instaladas el 2026-11-15: Frontend Design (Anthropic), Web Design Guidelines (Vercel) y Playwright MCP (fijado en 0.0.84), que refuerzan las fases 2, 4 y 5. Las de apoyo restantes, según necesidad. Las ⭕ B, C y D solo si la hipótesis lo pide.
 - Si el sitio es un solo HTML sin dependencias (caso luismulato.co), quedan fuera Astryx, Remotion y GSAP salvo decisión explícita.
 
 ## Recursos
