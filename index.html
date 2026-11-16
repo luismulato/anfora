@@ -1,5 +1,5 @@
 <!--
-  anfora-web v1.3.0 — este directorio (toolkit/anfora/packages/anfora-web/) ES
+  anfora-web v1.3.1 — este directorio (toolkit/anfora/packages/anfora-web/) ES
   la fuente única del motor (sin carpetas versions/X.Y.Z/, ver
   CHANGELOG.md para el historial). Cada instancia (Lab público,
   lm-personal embebida en dashboard, futuros dominios) vendorea el
@@ -808,6 +808,36 @@
   .palette-dot[data-palette="estandar"] { background: #007AFF; }
   .palette-dot[data-palette="cyberpunk"] { background: #00FFFF; box-shadow: 0 0 5px rgba(0, 255, 255, 0.7); }
   .palette-dot[data-palette="solarpunk"] { background: #2A7B50; }
+
+  /* ===== Mobile (≤620px): sin scroll horizontal, modal a pantalla casi completa ===== */
+  html { -webkit-text-size-adjust: 100%; }
+  img, video, iframe { max-width: 100%; }
+  .badge-row { flex-wrap: wrap; min-width: 0; }
+  .badge-tipo { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+  .item-title, .modal-title, .channel-name { overflow-wrap: anywhere; }
+  .modal-body { overflow-wrap: anywhere; }
+  .modal-body table { display: block; overflow-x: auto; max-width: 100%; }
+  .modal-body pre { max-width: 100%; }
+  @media (max-width: 620px) {
+    body { padding: 1.25rem 1rem 3rem; }
+    h1 { font-size: 1.5rem; }
+    .view-tab { padding: 0.55rem 1rem; }
+    .filter-chip { padding: 0.45rem 0.85rem; }
+    /* 16px en controles: iOS no hace zoom al enfocar */
+    .search-bar input, .sort-select, .secondary-select { font-size: 16px; }
+    .toolbar-row { flex-direction: column; align-items: flex-start; }
+    .sort-bar { flex-wrap: wrap; }
+    .sort-dir-btn, .path-action-btn, .modal-close { width: 36px; height: 36px; }
+    .modal-overlay { padding: 0.5rem; }
+    .modal-box { max-height: 100%; max-height: 100dvh; border-radius: 12px; }
+    .modal-header { padding: 0.9rem 1rem; gap: 0.6rem; }
+    .modal-body { padding: 1rem; font-size: 0.95rem; }
+    #modal-maximize-btn { display: none; }
+    .note-embed.portrait { max-width: 100%; }
+    /* el selector de paleta flota sobre el modal y tapa los botones */
+    body:has(.modal-overlay.open) .palette-picker { display: none; }
+    .palette-picker { top: 0.6rem; right: 0.6rem; }
+  }
 </style>
 </head>
 <body>
@@ -848,7 +878,7 @@
   <div class="view-panel" id="view-notas">
     <div class="search-bar">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/></svg>
-      <input type="text" id="search-input" placeholder="Buscar notas por título, fuente o contenido…" autocomplete="off">
+      <input type="text" id="search-input" placeholder="Buscar en las notas…" autocomplete="off">
     </div>
     <div class="toolbar-row">
       <div class="filters" id="filters">
